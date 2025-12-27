@@ -1,0 +1,25 @@
+DB -->
+
+    Users DB : ID -> NAME -> EMAIL -> PROFILEPIC URL -> DEFAULT GOAL -> ASSIGNED TRAINER 
+    GOAL DB : CALORIE GOAL -> PROTEIN GOAL -> FATS GOAL -> CARBS GOAL -> WEIGHT GOAL -> WATER GOAL -> STEPS GOAL -> SLEEP GOAL
+
+    UserMACROS DB : PROTEIN -> FATS -> CALORIES -> CARBS -> WEIGHT -> WATER -> STEPS -> SLEEP
+
+    TRAINERS DB : TRAINER ID -> TRAINER NAME -> TRAINER CLIENTS -> TRAINER EMAIL -> TRAINER SPECIALITY -> TRAINER PROFILE PIC URL 
+
+    WORKOUTS DB : WORKOUT NAME -> WORKOUT TYPE -> WORKOUT MUSCLE GROUP -> WORKOUT EQUIPMENT -> WORKOUT DIFFICULTY -> WORKOUT INSTRUCTIONS
+
+    ------------------------------------------------------------------------------------------------------------------------------------
+
+OPTIONAL DB -->
+
+    EXERCISES DB : EXERCISE NAME -> EXERCISE TYPE -> EXERCISE MUSCLE GROUP -> EXERCISE EQUIPMENT -> EXERCISE DIFFICULTY 
+
+
+Understanding -->
+
+    What we use Cors ?
+    Why we use express.json() ?
+    Why we use axios ?
+    Why "const token = await userCredential.user.getIdToken()" but not const token = userCredential.user.accessToken ?
+    Difference between accessToken and IdToken in Firebase Authentication ?
