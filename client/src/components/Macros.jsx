@@ -6,15 +6,15 @@ const Macros = () => {
 
     const getMacros = async () => {
     try {
-        const response = await axios.get("http://localhost:8080/getFoodMacros", {
+        const response = await axios.get("http://localhost:8080/macros/getFoodMacros", {
         params: { foodItem }
         });
         const nutrients = response.data.nutrients;
         console.log(nutrients)
-        console.log("Protein: ",nutrients.find(n => n.nutrientName === "Protein")?.value || "N/A");
-        console.log("Carbohydrates: ",nutrients.find(n => n.nutrientName === "Carbohydrate, by difference")?.value || "N/A");
-        console.log("Fats: ",nutrients.find(n => n.nutrientName === "Total lipid (fat)")?.value || "N/A");    
-        console.log("Fibre: ",nutrients.find(n => n.nutrientName === "Fiber, total dietary")?.value || "N/A");    
+        console.log("Protein: ",nutrients.find(n => n.nutrientName === "Protein")?.value || 0);
+        console.log("Carbohydrates: ",nutrients.find(n => n.nutrientName === "Carbohydrate, by difference")?.value || 0);
+        console.log("Fats: ",nutrients.find(n => n.nutrientName === "Total lipid (fat)")?.value || 0);    
+        console.log("Fibre: ",nutrients.find(n => n.nutrientName === "Fiber, total dietary")?.value || 0);    
 
     } catch (err) {
             console.error("Error fetching macros:", err.message);
