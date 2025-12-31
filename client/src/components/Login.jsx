@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { createUserWithEmailAndPassword ,getAuth} from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, googleSignIn} from 'firebase/auth';
 import { auth } from '../auth/firebase';
-import axios from 'axios'; 
+import axios from 'axios';
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -11,16 +11,15 @@ const Login = () => {
   const handleEmailPasswordRegister = async()=>{
     try{
       const userCredential = await createUserWithEmailAndPassword(auth,email,password);
-      // const token = userCredential.user.accessToken;
       const token = await userCredential.user.getIdToken();
       await axios.post('http://localhost:8080/register',{token,email,username,role});
-      console.log("User registered and token sent to server");
+      console.log("User registered token sent to server");
     }
     catch(error){
       console.error(error.code,error.message);
     }
   }
-  
+
   return (
     <>
     <input type="text" placeholder="Email" value={email} onChange={(e)=>setEmail(e.target.value)} />
