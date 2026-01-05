@@ -1,6 +1,7 @@
 DB -->
 
     Users DB : ID -> NAME -> EMAIL -> PROFILEPIC URL -> DEFAULT GOAL -> ASSIGNED TRAINER 
+
     GOAL DB : CALORIE GOAL -> PROTEIN GOAL -> FATS GOAL -> CARBS GOAL -> WEIGHT GOAL -> WATER GOAL -> STEPS GOAL -> SLEEP GOAL
 
     UserMACROS DB : PROTEIN -> FATS -> CALORIES -> CARBS -> WEIGHT -> WATER -> STEPS -> SLEEP
@@ -24,4 +25,6 @@ Understanding -->
     Why "const token = await userCredential.user.getIdToken()" but not const token = userCredential.user.accessToken ?
     Difference between accessToken and IdToken in Firebase Authentication ?
 
-Hii
+
+ToDo: 
+    We have to change the UserId at present we are using static userId for testing purpose but after implementing auth we have to get userId from auth middleware.

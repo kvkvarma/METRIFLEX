@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
+const DailyMacros = require('../models/dailymacors');
+
 
 router.get("/getFoodMacros", async (req, res) => {
   try {
@@ -28,6 +30,32 @@ router.get("/getFoodMacros", async (req, res) => {
   } catch (err) {
     console.error("USDA API Error:", err.message);
     res.status(500).json({ error: "Failed to fetch food macros" });
+  }
+});
+
+router.post('/addFoodMacros', async (req, res) => {
+  try{
+    const { macros, userId } = req.body;
+    //Sort using date while retreiving data
+    const date = new Date().toISOString().split('T')[0];
+    const setMacros = await DailyMacros.findOneAndUpdate(
+      { userId: userId, date: date },
+      {
+        $inc: {
+          protein: macros.protein || 0,
+          carbs: macros.carbs || 0,
+          fats: macros.fats || 0,
+          fibre: macros.fibre || 0,
+          calories: macros.calories || 0
+        }
+      },
+      { upsert: true, new: true }
+    );
+    res.status(200).json({ message: "Food macros added/updated successsfully"});
+  }
+  catch(err){
+    console.error("Error adding macros:", err.message);
+    res.status(500).json({ error: "Failed to add food macros" });
   }
 });
 

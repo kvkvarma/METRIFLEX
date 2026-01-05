@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const admin = require('../config/firebaseAdmin');
-const User = require('../models/users')
+const User = require('../models/users');
 
 router.post('/register', async (req, res) => {
   try {
@@ -73,4 +73,5 @@ router.post('/login',async(req,res)=>{
         res.status(401).json({ error: err.message });
     }
 });
+
 module.exports = router;

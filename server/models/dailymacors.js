@@ -13,6 +13,6 @@ const DailyMacrosSchema = new mongoose.Schema({
 
 DailyMacrosSchema.index({ userId: 1, date: 1 }, { unique: true });
 
-// UserId will be in incresing Order i.e. 1 means Ascending and -1 means Descending same for Date
+// UserId will be in increasing Order i.e. 1 means Ascending and -1 means Descending same for Date
 
 module.exports = mongoose.model('DailyMacros', DailyMacrosSchema);
