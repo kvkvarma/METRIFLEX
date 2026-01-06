@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import { NavLink } from "react-router-dom";
 const Dashboard = () => {
   const [open, setOpen] = useState(false);
 
@@ -16,18 +16,48 @@ const Dashboard = () => {
 
       {/* Sidebar */}
       <aside
-        className={`
-          fixed lg:static z-50 top-0 left-0 h-full w-20
-          bg-purple-300 flex flex-col items-center py-6 space-y-6
-          transform transition-transform duration-300
-          ${open ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0
-        `}
-      >
-        <div className="w-10 h-10 bg-purple-700 rounded-xl" />
-        <div className="w-6 h-6 bg-white rounded" />
-        <div className="w-6 h-6 bg-white rounded" />
-        <div className="w-6 h-6 bg-white rounded" />
-      </aside>
+  className={`
+    fixed lg:static z-50 top-0 left-0 h-full w-20
+    bg-purple-300 flex flex-col items-center py-6 space-y-6
+    transform transition-transform duration-300
+    ${open ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0
+  `}
+>
+  <div className="w-10 h-10 bg-purple-700 rounded-xl" />
+
+  <NavLink
+    to="/"
+    className="flex flex-col items-center text-xs gap-1"
+  >
+    <div className="w-6 h-6 bg-white rounded" />
+    Dashboard
+  </NavLink>
+
+  <NavLink
+    to="/trainers"
+    className="flex flex-col items-center text-xs gap-1"
+  >
+    <div className="w-6 h-6 bg-white rounded" />
+    Trainers
+  </NavLink>
+
+  <NavLink
+    to="/workout-splits"
+    className="flex flex-col items-center text-xs gap-1"
+  >
+    <div className="w-6 h-6 bg-white rounded" />
+    Splits
+  </NavLink>
+
+  <NavLink
+    to="/macros"
+    className="flex flex-col items-center text-xs gap-1"
+  >
+    <div className="w-6 h-6 bg-white rounded" />
+    Macros
+  </NavLink>
+</aside>
+
 
       {/* Main Content */}
       <main className="flex-1 p-4 lg:p-6 space-y-6 overflow-y-auto">
