@@ -1,7 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import axios from 'axios';
+
 const Dashboard = () => {
   const [open, setOpen] = useState(false);
+  const [dailyMacrosData, setDailyMacrosData] = useState([]);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchDailyMacros = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8080/macros/getDailyMacros",
+          {
+            params: { user: user.uid }
+          }
+        );
+        setDailyMacrosData(response.data.userDailyMacrosData);
+      } catch (err) {
+        console.error(err.message);
+      }
+    };
+    fetchDailyMacros();
+  }, [user]);
+
+  console.log(dailyMacrosData);
+  console.log(dailyMacrosData[0]?.protein);
+
 
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
@@ -16,12 +44,7 @@ const Dashboard = () => {
 
       {/* Sidebar */}
       <aside
-  className={`
-    fixed lg:static z-50 top-0 left-0 h-full w-20
-    bg-purple-300 flex flex-col items-center py-6 space-y-6
-    transform transition-transform duration-300
-    ${open ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0
-  `}
+  className={`fixed lg:static z-50 top-0 left-0 h-full w-20 bg-purple-300 flex flex-col items-center py-6 space-y-6 transform transition-transform duration-300 ${open ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
 >
   <div className="w-10 h-10 bg-purple-700 rounded-xl" />
 
@@ -96,7 +119,7 @@ const Dashboard = () => {
           <div className="bg-red-300 h-28 rounded-xl p-4">Today's Plan</div>
           <div className="bg-blue-300 h-28 rounded-xl p-4">Sleep</div>
           <div className="bg-green-300 h-28 rounded-xl p-4">Steps</div>
-          <div className="bg-orange-300 h-28 rounded-xl p-4">Food</div>
+          <div className="bg-orange-300 h-28 rounded-xl p-4">Protein</div> 
           <div className="bg-pink-300 h-28 rounded-xl p-4">Heart</div>
         </section>
 

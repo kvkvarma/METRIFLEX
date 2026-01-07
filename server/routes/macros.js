@@ -33,6 +33,24 @@ router.get("/getFoodMacros", async (req, res) => {
   }
 });
 
+
+router.get('/getDailyMacros',async(req,res)=>{
+  try{
+    const userId = req.query.user;
+    if(!userId){
+      res.status(400).json({error:"UserID Required!"});
+    }
+    const dailyMacrosOfUser = await DailyMacros.find({userId: userId}).sort({date:-1});
+    console.log(dailyMacrosOfUser);
+    res.status(200).json({userDailyMacrosData : dailyMacrosOfUser})
+  }
+  catch(err){
+    console.error("Error fetching daily macros:", err.message);
+    res.status(500).json({ error: "Failed to fetch daily macros" });
+  }
+})
+
+
 router.post('/addFoodMacros', async (req, res) => {
   try{
     const { macros, userId } = req.body;

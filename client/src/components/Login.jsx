@@ -9,7 +9,7 @@ import WorkoutSplit from './WorkoutSplit';
 
 const Login = () => {
   const [mode, setMode] = useState("login");
-  const [loggedIn, setLoggedIn] = useState(true);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   //const [showLoader,setShowLoader] = useState(false);
 
