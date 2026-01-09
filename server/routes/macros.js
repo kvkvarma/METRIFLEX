@@ -40,7 +40,7 @@ router.get('/getDailyMacros',async(req,res)=>{
     if(!userId){
       res.status(400).json({error:"UserID Required!"});
     }
-    const dailyMacrosOfUser = await DailyMacros.find({userId: userId}).sort({date:-1});
+    const dailyMacrosOfUser = await DailyMacros.find({userId: userId}).sort({date:1});
     console.log(dailyMacrosOfUser);
     res.status(200).json({userDailyMacrosData : dailyMacrosOfUser})
   }

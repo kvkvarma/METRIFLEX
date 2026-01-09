@@ -2,15 +2,22 @@ import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import axios from 'axios';
-
-const Dashboard = () => {
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+const Dashboard = (props) => {
   const [open, setOpen] = useState(false);
   const [dailyMacrosData, setDailyMacrosData] = useState([]);
   const { user } = useAuth();
+  const [displayChart, setDisplayChart] = useState("protein");
 
   useEffect(() => {
     if (!user) return;
-
     const fetchDailyMacros = async () => {
       try {
         const response = await axios.get(
@@ -25,10 +32,19 @@ const Dashboard = () => {
       }
     };
     fetchDailyMacros();
-  }, [user]);
+  }, []);
 
-  console.log(dailyMacrosData);
-  console.log(dailyMacrosData[0]?.protein);
+  // console.log("Daily Macros",dailyMacrosData);
+  
+  const newMacros = dailyMacrosData.map(item => ({
+      date: item.date,
+      protein: item.protein,
+      carbs: item.carbs,
+      fats: item.fats,
+      calories: item.calories,
+}));
+
+  // console.log("New Macros : ", newMacros);
 
 
   return (
@@ -131,14 +147,52 @@ const Dashboard = () => {
         </section>
 
         {/* Bottom Section */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="lg:col-span-2 bg-rose-300 h-72 rounded-xl p-4">
-            Popular Trainers
-          </div>
-          <div className="bg-cyan-300 h-72 rounded-xl p-4">
-            Workout Statistics
-          </div>
-        </section>
+       <div className="lg:col-span-2 bg-white rounded-xl p-4">
+        <select value={displayChart} name="displayChart" id="displayChart" onChange={(e) => setDisplayChart(e.target.value)} > <option value="protein">Protein</option> <option value="carbs">Carbs</option> <option value="fats">Fats</option> <option value="calories">Calories</option> </select>
+      <ResponsiveContainer width="50%" height={220}>
+      <AreaChart data={newMacros}>
+        <defs>
+          <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#111827" stopOpacity={0.3} />
+            <stop offset="95%" stopColor="#111827" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+
+        <XAxis
+          dataKey="date"
+          tickFormatter={(value) =>
+            new Date(value).toLocaleDateString("en-US", { weekday: "short" })
+          }
+          tickLine={false}
+          axisLine={false}
+        />
+
+        <YAxis hide />
+
+        <Tooltip
+          labelFormatter={(value) =>
+            new Date(value).toLocaleDateString("en-US", {
+              weekday: "long",
+              month: "short",
+              day: "numeric",
+            })
+          }
+        />
+
+        <Area
+          type="monotone"
+          dataKey={displayChart}
+          stroke="#111827"
+          strokeWidth={2.5}
+          fill="url(#colorValue)"
+          dot={false}
+          activeDot={{ r: 5 }}
+        />
+      </AreaChart>
+    </ResponsiveContainer>
+
+</div>
+
 
       </main>
     </div>

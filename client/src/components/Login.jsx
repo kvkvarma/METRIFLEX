@@ -40,7 +40,6 @@ const Login = () => {
       //   setShowLoader(false);
       //   setLoggedIn(true);
       // },3000)
-
       setLoggedIn(true);
     } catch (error) {
       console.error(error.code, error.message);
@@ -63,7 +62,6 @@ const Login = () => {
       //   setShowLoader(false);
       //   setLoggedIn(true);
       // },3000)
-
       setLoggedIn(true);
     } catch (error) {
       console.error(error.code, error.message);
@@ -86,7 +84,6 @@ const Login = () => {
       //   setShowLoader(false);
       //   setLoggedIn(true);
       // },3000)
-
       setLoggedIn(true);
     } catch (error) {
       console.error(error.code, error.message);
