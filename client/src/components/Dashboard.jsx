@@ -1,15 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import MacrosCard from "./MacroCard";
 import axios from 'axios';
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 const Dashboard = (props) => {
   const [open, setOpen] = useState(false);
   const [dailyMacrosData, setDailyMacrosData] = useState([]);
@@ -34,7 +28,6 @@ const Dashboard = (props) => {
     fetchDailyMacros();
   }, []);
 
-  // console.log("Daily Macros",dailyMacrosData);
   
   const newMacros = dailyMacrosData.map(item => ({
       date: item.date,
@@ -44,10 +37,16 @@ const Dashboard = (props) => {
       calories: item.calories,
 }));
 
-  // console.log("New Macros : ", newMacros);
+const todayEntry = useMemo(() => {
+  const todayDate = new Date().toISOString().split("T")[0];
+  return newMacros.find(item =>
+    item.date.startsWith(todayDate)
+  );
+}, [newMacros]);
 
 
   return (
+    
     <div className="flex h-screen bg-gray-100 overflow-hidden">
 
       {/* Mobile Overlay */}
@@ -60,7 +59,7 @@ const Dashboard = (props) => {
 
       {/* Sidebar */}
       <aside
-  className={`fixed lg:static z-50 top-0 left-0 h-full w-20 bg-purple-300 flex flex-col items-center py-6 space-y-6 transform transition-transform duration-300 ${open ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
+  className={`fixed lg:static z-50 top-0 left-0 h-full w-30 bg-purple-300 flex flex-col items-center py-6 space-y-6 transform transition-transform duration-300 ${open ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
 >
   <div className="w-10 h-10 bg-purple-700 rounded-xl" />
 
@@ -100,8 +99,20 @@ const Dashboard = (props) => {
 
       {/* Main Content */}
       <main className="flex-1 p-4 lg:p-6 space-y-6 overflow-y-auto">
-
+  
         {/* Header */}
+        <MacrosCard
+          todayMacros={{
+            carbs: todayEntry?.carbs || 0,
+            fats: todayEntry?.fats || 0,
+            protein: todayEntry?.protein || 0,
+          }}
+          macroGoals={{
+            carbs: 165,
+            fats: 65,
+            protein: 85,
+          }}
+        />
         <div className="flex justify-between items-center bg-yellow-200 p-4 rounded-xl">
 
           <div className="flex items-center gap-3">
@@ -113,6 +124,7 @@ const Dashboard = (props) => {
               ☰
             </button>
 
+             
             <div>
               <h1 className="text-lg lg:text-xl font-bold">
                 Welcome Back, Alex! Let’s crush today
@@ -122,7 +134,6 @@ const Dashboard = (props) => {
               </p>
             </div>
           </div>
-
           <div className="flex gap-2">
             <div className="w-9 h-9 bg-white rounded-full" />
             <div className="w-9 h-9 bg-white rounded-full" />
@@ -132,25 +143,23 @@ const Dashboard = (props) => {
 
         {/* Daily Task (DESKTOP SAME AS IMAGE) */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+         
           <div className="bg-red-300 h-28 rounded-xl p-4">Today's Plan</div>
           <div className="bg-blue-300 h-28 rounded-xl p-4">Sleep</div>
-          <div className="bg-green-300 h-28 rounded-xl p-4">Steps</div>
-          <div className="bg-orange-300 h-28 rounded-xl p-4">Protein</div> 
+          <div className="bg-green-300 h-28 rounded-xl p-4">
+            Steps
+            <p>23482</p>
+          </div>
+          <div className="bg-orange-300 h-28 rounded-xl p-4">Food</div> 
           <div className="bg-pink-300 h-28 rounded-xl p-4">Heart</div>
         </section>
 
         {/* Overview / Calories / Activity */}
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="bg-indigo-300 h-64 rounded-xl p-4">Overview</div>
-          <div className="bg-teal-300 h-64 rounded-xl p-4">Calories</div>
-          <div className="bg-lime-300 h-64 rounded-xl p-4">Fitness Activity</div>
-        </section>
-
-        {/* Bottom Section */}
-       <div className="lg:col-span-2 bg-white rounded-xl p-4">
-        <select value={displayChart} name="displayChart" id="displayChart" onChange={(e) => setDisplayChart(e.target.value)} > <option value="protein">Protein</option> <option value="carbs">Carbs</option> <option value="fats">Fats</option> <option value="calories">Calories</option> </select>
-      <ResponsiveContainer width="50%" height={220}>
-      <AreaChart data={newMacros}>
+          <div className="bg-gray-200 h-64 rounded-xl p-4">
+             <select value={displayChart} name="displayChart" id="displayChart" onChange={(e) => setDisplayChart(e.target.value)} > <option value="protein">Protein</option> <option value="carbs">Carbs</option> <option value="fats">Fats</option> <option value="calories">Calories</option> </select>
+        <ResponsiveContainer width="100%" height={220}>
+         <AreaChart data={newMacros}>
         <defs>
           <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="#111827" stopOpacity={0.3} />
@@ -190,6 +199,14 @@ const Dashboard = (props) => {
         />
       </AreaChart>
     </ResponsiveContainer>
+          </div>
+          <div className="bg-teal-300 h-64 rounded-xl p-4">Calories</div>
+          <div className="bg-lime-300 h-64 rounded-xl p-4">Fitness Activity</div>
+        </section>
+
+        {/* Bottom Section */}
+       <div className="lg:col-span-2 bg-white rounded-xl p-4">
+       Trainers
 
 </div>
 
