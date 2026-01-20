@@ -6,7 +6,10 @@ const DailyMacrosSchema = new mongoose.Schema({
     calories: { type: Number, default: 0 },
     protein: { type: Number, default: 0 },
     carbs: { type: Number, default: 0 },
-    fats: { type: Number, default: 0 }
+    fats: { type: Number, default: 0 },
+    water: { type: Number, default: 0 },
+    sleep: { type: Number, default: 0 },
+    steps: { type: Number, default: 0 }
 }, { timestamps: true });
 
 // Ensure one record per user per day

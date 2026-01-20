@@ -12,7 +12,7 @@ function App() {
       <Route path="/" element={<Login />} />
       <Route path="/dashboard" element={<Dashboard />} />
       {/* <Route path="/trainers" element={<Trainers />} /> */}
-      <Route path="/workout-splits" element={<WorkoutSplit />} />
+      <Route path="/workoutsplits" element={<WorkoutSplit />} />
       <Route path="/macros" element={<Macros />} />
     </Routes>
   );

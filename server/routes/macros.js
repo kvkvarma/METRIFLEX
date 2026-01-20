@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const DailyMacros = require('../models/dailymacors');
-
+const users = require('../models/users');
 
 router.get("/getFoodMacros", async (req, res) => {
   try {
@@ -41,7 +41,6 @@ router.get('/getDailyMacros',async(req,res)=>{
       res.status(400).json({error:"UserID Required!"});
     }
     const dailyMacrosOfUser = await DailyMacros.find({userId: userId}).sort({date:1});
-    console.log(dailyMacrosOfUser);
     res.status(200).json({userDailyMacrosData : dailyMacrosOfUser})
   }
   catch(err){
@@ -50,6 +49,22 @@ router.get('/getDailyMacros',async(req,res)=>{
   }
 })
 
+router.get('/getMAcroGoals',async(req,res)=>{
+  try{
+    const userId = req.query.user;
+    // console.log(userId);
+    if(!userId){
+      res.status(400).json({error:"UserID Required!"});
+    }
+    const goalsOfUser = await users.findOne({userId: userId});
+    // console.log(goalsOfUser);
+    res.status(200).json({macroGoals : goalsOfUser})
+  }
+  catch(err){
+    console.error("Error fetching user goals:", err.message);
+    res.status(500).json({ error: "Failed to fetch user goals" });
+  }
+})
 
 router.post('/addFoodMacros', async (req, res) => {
   try{

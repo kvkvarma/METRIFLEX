@@ -2,40 +2,64 @@ import React, { useEffect, useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import MacrosCard from "./MacroCard";
+import TodaysPlan from "./TodaysPlan";
 import axios from 'axios';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-const Dashboard = (props) => {
+
+const Dashboard = () => {
   const [open, setOpen] = useState(false);
   const [dailyMacrosData, setDailyMacrosData] = useState([]);
+  const [targetUserGoals, setTargetUserGoals] = useState({});
   const { user } = useAuth();
   const [displayChart, setDisplayChart] = useState("protein");
-
+  const totalGoals = 4;
   useEffect(() => {
     if (!user) return;
     const fetchDailyMacros = async () => {
       try {
-        const response = await axios.get(
+        const dailyMacrosResponse = await axios.get(
           "http://localhost:8080/macros/getDailyMacros",
           {
             params: { user: user.uid }
           }
         );
-        setDailyMacrosData(response.data.userDailyMacrosData);
+        const userGoalsResponse= await axios.get(
+          "http://localhost:8080/macros/getMacroGoals",
+          {
+            params: { user: user.uid }
+          }
+        );
+        setDailyMacrosData(dailyMacrosResponse.data.userDailyMacrosData);
+        console.log(userGoalsResponse.data.macroGoals.goal)
+        setTargetUserGoals(userGoalsResponse.data.macroGoals.goal);
       } catch (err) {
         console.error(err.message);
       }
     };
     fetchDailyMacros();
   }, []);
-
   
+  console.log("targetGoals : ",targetUserGoals);
   const newMacros = dailyMacrosData.map(item => ({
       date: item.date,
       protein: item.protein,
       carbs: item.carbs,
       fats: item.fats,
       calories: item.calories,
+      steps: item.steps,
+      sleep: item.sleep,
+      water: item.water
 }));
+const userGoals = {
+  waterGoal: targetUserGoals?.water ?? 0,
+  sleepGoal: targetUserGoals?.sleep ?? 0,
+  stepsGoal: targetUserGoals?.steps ?? 0,
+  calorieGoal: targetUserGoals?.calories ?? 0,
+  proteinGoal: targetUserGoals?.protein ?? 0,
+  carbsGoal: targetUserGoals?.carbs ?? 0,
+  fatsGoal: targetUserGoals?.fats ?? 0,
+};
+console.log(userGoals)
 
 const todayEntry = useMemo(() => {
   const todayDate = new Date().toISOString().split("T")[0];
@@ -43,8 +67,7 @@ const todayEntry = useMemo(() => {
     item.date.startsWith(todayDate)
   );
 }, [newMacros]);
-
-
+console.log(todayEntry);
   return (
     
     <div className="flex h-screen bg-gray-100 overflow-hidden">
@@ -108,9 +131,9 @@ const todayEntry = useMemo(() => {
             protein: todayEntry?.protein || 0,
           }}
           macroGoals={{
-            carbs: 165,
-            fats: 65,
-            protein: 85,
+            carbs: userGoals?.carbsGoal||0,
+            fats: userGoals?.fatsGoal||0,
+            protein: userGoals?.proteinGoal||0,
           }}
         />
         <div className="flex justify-between items-center bg-yellow-200 p-4 rounded-xl">
@@ -144,7 +167,9 @@ const todayEntry = useMemo(() => {
         {/* Daily Task (DESKTOP SAME AS IMAGE) */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
          
-          <div className="bg-red-300 h-28 rounded-xl p-4">Today's Plan</div>
+          <div className="bg-red-300 h-28 rounded-xl p-4">Today's Plan
+            <TodaysPlan userGoals={userGoals} todayEntry={todayEntry} />
+          </div>
           <div className="bg-blue-300 h-28 rounded-xl p-4">Sleep</div>
           <div className="bg-green-300 h-28 rounded-xl p-4">
             Steps
