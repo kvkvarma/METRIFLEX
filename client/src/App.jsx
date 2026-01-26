@@ -5,16 +5,19 @@ import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import WorkoutSplit from './components/WorkoutSplit';
 import Macros from './components/Macros';
-
+import Sidebar from './components/Sidebar';
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      {/* <Route path="/trainers" element={<Trainers />} /> */}
-      <Route path="/workoutsplits" element={<WorkoutSplit />} />
-      <Route path="/macros" element={<Macros />} />
-    </Routes>
+     
+      <Routes>
+        <Route element={<Sidebar />}>
+          <Route path="/" element={<Login />} />
+          <Route path="/Dashboard" element={<Dashboard />} />
+          <Route path="/workoutsplits" element={<WorkoutSplit />} />
+          <Route path="/macros" element={<Macros />} />
+        </Route>
+
+      </Routes>
   );
 }
 

@@ -53,9 +53,9 @@ const MacroCard = ({ todayMacros, macroGoals }) => {
   let offset = 0;
 
   return (
-    <div className="flex items-center gap-8 bg-white p-6 rounded-xl shadow w-full max-w-md">
+    <div className="flex items-center gap-8 bg-white p-6 rounded-xl shadow hover:shadow-lg transition-shadow lg:col-span-2">
       {/* 🔵 CIRCLE */}
-      <div className="relative w-[200px] h-[200px] sm:w-[220px] sm:h-[220px]">
+      <div className="relative w-44 h-44">
         <svg
           viewBox="0 0 220 220"
           className="-rotate-90 w-full h-full"
@@ -107,7 +107,7 @@ const MacroCard = ({ todayMacros, macroGoals }) => {
       </div>
 
       {/* 📊 SIDE DATA */}
-      <div className="flex flex-col justify-center gap-4 min-w-[160px]">
+      <div className="flex flex-col justify-center gap-4 ">
         <MacroRow
           label="Protein"
           color="bg-red-500"

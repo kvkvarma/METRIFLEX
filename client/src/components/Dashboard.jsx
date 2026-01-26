@@ -1,18 +1,23 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { FaHeart } from "react-icons/fa6";
+import { IoFootsteps } from "react-icons/io5";
+
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import CaloriesCard from "./CaloriesCard";
 import MacrosCard from "./MacroCard";
 import TodaysPlan from "./TodaysPlan";
 import axios from 'axios';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { useOutletContext } from "react-router-dom";
 
 const Dashboard = () => {
-  const [open, setOpen] = useState(false);
+
   const [dailyMacrosData, setDailyMacrosData] = useState([]);
   const [targetUserGoals, setTargetUserGoals] = useState({});
   const { user } = useAuth();
   const [displayChart, setDisplayChart] = useState("protein");
-  const totalGoals = 4;
+  const { setOpen } = useOutletContext();
   useEffect(() => {
     if (!user) return;
     const fetchDailyMacros = async () => {
@@ -50,6 +55,7 @@ const Dashboard = () => {
       sleep: item.sleep,
       water: item.water
 }));
+
 const userGoals = {
   waterGoal: targetUserGoals?.water ?? 0,
   sleepGoal: targetUserGoals?.sleep ?? 0,
@@ -70,76 +76,16 @@ const todayEntry = useMemo(() => {
 console.log(todayEntry);
   return (
     
-    <div className="flex h-screen bg-gray-100 overflow-hidden">
-
-      {/* Mobile Overlay */}
-      {open && (
-        <div
-          className="fixed inset-0 bg-black/40 z-40 lg:hidden"
-          onClick={() => setOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside
-  className={`fixed lg:static z-50 top-0 left-0 h-full w-30 bg-purple-300 flex flex-col items-center py-6 space-y-6 transform transition-transform duration-300 ${open ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
->
-  <div className="w-10 h-10 bg-purple-700 rounded-xl" />
-
-  <NavLink
-    to="/"
-    className="flex flex-col items-center text-xs gap-1"
-  >
-    <div className="w-6 h-6 bg-white rounded" />
-    Dashboard
-  </NavLink>
-
-  <NavLink
-    to="/trainers"
-    className="flex flex-col items-center text-xs gap-1"
-  >
-    <div className="w-6 h-6 bg-white rounded" />
-    Trainers
-  </NavLink>
-
-  <NavLink
-    to="/workout-splits"
-    className="flex flex-col items-center text-xs gap-1"
-  >
-    <div className="w-6 h-6 bg-white rounded" />
-    Splits
-  </NavLink>
-
-  <NavLink
-    to="/macros"
-    className="flex flex-col items-center text-xs gap-1"
-  >
-    <div className="w-6 h-6 bg-white rounded" />
-    Macros
-  </NavLink>
-</aside>
-
-
+    <>
       {/* Main Content */}
       <main className="flex-1 p-4 lg:p-6 space-y-6 overflow-y-auto">
   
         {/* Header */}
-        <MacrosCard
-          todayMacros={{
-            carbs: todayEntry?.carbs || 0,
-            fats: todayEntry?.fats || 0,
-            protein: todayEntry?.protein || 0,
-          }}
-          macroGoals={{
-            carbs: userGoals?.carbsGoal||0,
-            fats: userGoals?.fatsGoal||0,
-            protein: userGoals?.proteinGoal||0,
-          }}
-        />
-        <div className="flex justify-between items-center bg-yellow-200 p-4 rounded-xl">
+        
+        <div className="flex justify-between items-center bg-gray-300 p-4 rounded-xl">
 
           <div className="flex items-center gap-3">
-            {/* Hamburger ONLY for mobile */}
+
             <button
               className="lg:hidden p-2 bg-white rounded"
               onClick={() => setOpen(true)}
@@ -165,23 +111,58 @@ console.log(todayEntry);
         </div>
 
         {/* Daily Task (DESKTOP SAME AS IMAGE) */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-         
-          <div className="bg-red-300 h-28 rounded-xl p-4">Today's Plan
+
+        <section className="grid grid-cols-2 lg:grid-cols-6 gap-4 items-stretch">
+          <div className="col-span-2 bg-white h-28 rounded-xl p-4 flex items-center">
             <TodaysPlan userGoals={userGoals} todayEntry={todayEntry} />
           </div>
-          <div className="bg-blue-300 h-28 rounded-xl p-4">Sleep</div>
-          <div className="bg-green-300 h-28 rounded-xl p-4">
-            Steps
-            <p>23482</p>
+
+          <div className="col-span-1 bg-white h-28 rounded-xl p-4 flex flex-col justify-between">
+            <span className="text-sm font-medium">Sleep</span>
+            <span className="text-xl font-semibold">8.3 hr</span>
           </div>
-          <div className="bg-orange-300 h-28 rounded-xl p-4">Food</div> 
-          <div className="bg-pink-300 h-28 rounded-xl p-4">Heart</div>
+
+          <div className="col-span-1 bg-white h-28 rounded-xl p-4 flex flex-col justify-between">
+            <span className="text-sm font-medium">Steps</span>
+            <div className="flex items-center gap-2">
+              <IoFootsteps size={22} />
+              <span className="text-xl font-semibold">2376</span>
+            </div>
+          </div>
+
+          <div className="col-span-1 bg-white h-28 rounded-xl p-4 flex flex-col justify-between">
+            <span className="text-sm font-medium">Food</span>
+            <span className="text-xl font-semibold">1200 kcal</span>
+          </div>
+
+          <div className="col-span-1 bg-white h-28 rounded-xl p-4 flex flex-col justify-between">
+            <span className="text-sm font-medium">Heart</span>
+            <div className="flex items-center gap-2">
+              <FaHeart size={20} />
+              <span className="text-xl font-semibold">63 bpm</span>
+            </div>
+          </div>
+
         </section>
 
         {/* Overview / Calories / Activity */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="bg-gray-200 h-64 rounded-xl p-4">
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+             <MacrosCard 
+              todayMacros={{
+                carbs: todayEntry?.carbs || 0,
+                fats: todayEntry?.fats || 0,
+                protein: todayEntry?.protein || 0,
+              }}
+              macroGoals={{
+                carbs: userGoals?.carbsGoal || 0,
+                fats: userGoals?.fatsGoal || 0,
+                protein: userGoals?.proteinGoal || 0,
+              }}
+            />
+         <div className="lg:col-span-1">
+              <CaloriesCard dailyMacrosData = {dailyMacrosData} todayEntry = {todayEntry} userGoals = {userGoals} />
+         </div>
+          <div className="bg-gray-200 h-64 rounded-xl p-4 lg:col-span-3">
              <select value={displayChart} name="displayChart" id="displayChart" onChange={(e) => setDisplayChart(e.target.value)} > <option value="protein">Protein</option> <option value="carbs">Carbs</option> <option value="fats">Fats</option> <option value="calories">Calories</option> </select>
         <ResponsiveContainer width="100%" height={220}>
          <AreaChart data={newMacros}>
@@ -225,8 +206,6 @@ console.log(todayEntry);
       </AreaChart>
     </ResponsiveContainer>
           </div>
-          <div className="bg-teal-300 h-64 rounded-xl p-4">Calories</div>
-          <div className="bg-lime-300 h-64 rounded-xl p-4">Fitness Activity</div>
         </section>
 
         {/* Bottom Section */}
@@ -237,7 +216,7 @@ console.log(todayEntry);
 
 
       </main>
-    </div>
+    </>
   );
 };
 
