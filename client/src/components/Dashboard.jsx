@@ -3,7 +3,10 @@ import { FaHeart } from "react-icons/fa6";
 import { IoFootsteps } from "react-icons/io5";
 import { GiNightSleep, GiRoastChicken } from "react-icons/gi";
 import { useOutletContext } from "react-router-dom";
+import ProgressWithLabel from "./ProgressWithLabel";
+import Graph from "./Graph";
 import axios from "axios";
+
 import {
   AreaChart,
   Area,
@@ -166,34 +169,9 @@ const Dashboard = () => {
             todayEntry={todayEntry}
             userGoals={userGoals}
           />
-
-          <div className="bg-white rounded-xl p-4 lg:col-span-3">
-            <select
-              value={displayChart}
-              onChange={(e) => setDisplayChart(e.target.value)}
-              className="mb-2 p-1 rounded"
-            >
-              <option value="protein">Protein</option>
-              <option value="carbs">Carbs</option>
-              <option value="fats">Fats</option>
-              <option value="calories">Calories</option>
-            </select>
-
-            <ResponsiveContainer width="100%" height={220}>
-              <AreaChart data={newMacros}>
-                <XAxis dataKey="date" hide />
-                <YAxis hide />
-                <Tooltip />
-                <Area
-                  type="monotone"
-                  dataKey={displayChart}
-                  stroke="#111827"
-                  fill="#11182733"
-                  strokeWidth={2}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
+           <div className="bg-white rounded-xl p-4 lg:col-span-3">
+            <Graph dailyMacrosData={dailyMacrosData}/>
+          </div> 
         </section>
       </div>
       {/*================= BOTTOM CONTENT =================*/}
@@ -261,18 +239,8 @@ const Dashboard = () => {
     </div>
 
     <div className="space-y-3 mt-6">
-      <div>
-        <p className="text-xs">VO₂ max</p>
-        <div className="h-2 bg-gray-200 rounded-full">
-          <div className="h-2 w-1/3 bg-red-500 rounded-full" />
-        </div>
-      </div>
-      <div>
-        <p className="text-xs">Fat burning</p>
-        <div className="h-2 bg-gray-200 rounded-full">
-          <div className="h-2 w-2/3 bg-lime-400 rounded-full" />
-        </div>
-      </div>
+      <ProgressWithLabel />
+      <ProgressWithLabel />
     </div>
   </div>
 </div>
