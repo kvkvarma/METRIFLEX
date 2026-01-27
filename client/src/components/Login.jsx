@@ -4,14 +4,11 @@ import { auth } from '../auth/firebase';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import Dashboard from './Dashboard';
-import Macros from './Macros';
-import WorkoutSplit from './WorkoutSplit';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+  const navigate = useNavigate();
   const [mode, setMode] = useState("login");
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  //const [showLoader,setShowLoader] = useState(false);
 
   const { setUser } = useAuth();
   const [email, setEmail] = useState("");
@@ -34,13 +31,7 @@ const Login = () => {
         role
       });
       setUser({ uid: userCredential.user.uid });
-
-      // setShowLoader(true);
-      // setTimeout(()=>{
-      //   setShowLoader(false);
-      //   setLoggedIn(true);
-      // },3000)
-      setLoggedIn(true);
+      navigate('/Dashboard');
     } catch (error) {
       console.error(error.code, error.message);
     }
@@ -56,13 +47,7 @@ const Login = () => {
       const token = await userLoggedIn.user.getIdToken();
       await axios.post("http://localhost:8080/auth/login", { token });
       setUser({ uid: userLoggedIn.user.uid });
-
-      //  setShowLoader(true);
-      // setTimeout(()=>{
-      //   setShowLoader(false);
-      //   setLoggedIn(true);
-      // },3000)
-      setLoggedIn(true);
+      navigate('/Dashboard');
     } catch (error) {
       console.error(error.code, error.message);
     }
@@ -72,34 +57,14 @@ const Login = () => {
     try {
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
-
       const token = await userCredential.user.getIdToken();
-
       await axios.post("http://localhost:8080/auth/googleSignin", { token });
-
       setUser({ uid: userCredential.user.uid });
-
-      //  setShowLoader(true);
-      // setTimeout(()=>{
-      //   setShowLoader(false);
-      //   setLoggedIn(true);
-      // },3000)
-      setLoggedIn(true);
+      navigate('/Dashboard');
     } catch (error) {
       console.error(error.code, error.message);
     }
   };
-
-  // {showLoader && (
-  //     <BlinkBlur
-  //       color="#32cd32"
-  //       size="medium"
-  //       text="Logging you in..."
-  //       textColor="#000"
-  //     />
-  //   )}
-
-  if (loggedIn) return <Dashboard />;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">

@@ -99,7 +99,7 @@ const MacroCard = ({ todayMacros, macroGoals }) => {
 
         {/* CENTER */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <div className="text-3xl font-bold">
+          <div className="text-3xl font-semibold">
             {Math.round(totalFill)}%
           </div>
           <span className="text-gray-500 text-sm">Total</span>
@@ -107,7 +107,7 @@ const MacroCard = ({ todayMacros, macroGoals }) => {
       </div>
 
       {/* 📊 SIDE DATA */}
-      <div className="flex flex-col justify-center gap-4 ">
+      <div className="flex flex-col justify-center gap-4 text-sm">
         <MacroRow
           label="Protein"
           color="bg-red-500"
@@ -160,7 +160,7 @@ const MacroRow = ({ label, color, percent, diff }) => (
     </div>
 
     <div className="text-right">
-      <div className="font-semibold">{percent.toFixed(2)}%</div>
+      <div className="font-medium">{percent.toFixed(1)}%</div>
       {diff >= 0 ? (
         <div className="text-green-500 text-sm">
           +{diff.toFixed(1)}%

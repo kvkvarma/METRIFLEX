@@ -4,7 +4,6 @@ import { LuLayoutDashboard } from "react-icons/lu";
 import { FaPeopleGroup } from "react-icons/fa6";
 import { MdHorizontalSplit } from "react-icons/md";
 import { GiForkKnifeSpoon } from "react-icons/gi";
-import { HiMenuAlt2 } from "react-icons/hi";
 
 const Sidebar = () => {
   const [open, setOpen] = useState(false);
