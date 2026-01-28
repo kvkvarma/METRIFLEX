@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 const splitsData = [
   {
     id: 1,
@@ -91,17 +91,6 @@ const splitsData = [
   },
   {
     id: 8,
-    title: "3-Day Push Pull Legs",
-    description:
-      "Minimal yet effective split for busy schedules and consistency.",
-    days: [
-      { day: "Day 1", muscles: "Push Muscles" },
-      { day: "Day 2", muscles: "Pull Muscles" },
-      { day: "Day 3", muscles: "Legs" }
-    ]
-  },
-  {
-    id: 9,
     title: "Glutes & Legs Focus (Women)",
     description:
       "Lower-body focused split for toning and strength.",
@@ -113,7 +102,7 @@ const splitsData = [
     ]
   },
   {
-    id: 10,
+    id: 9,
     title: "Fat Loss / Cutting Split",
     description:
       "High-frequency training combined with cardio for fat loss.",
@@ -125,32 +114,42 @@ const splitsData = [
     ]
   }
 ];
-
 const WorkoutSplit = () => {
   const [selectedSplit, setSelectedSplit] = useState(null);
-
+  const navigate = useNavigate();
   return (
-    <>
-      {/* GRID OF CARDS */}
-    <h1 className="flex justify-center text-2xl">Workout Splits</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+    <div className="min-h-screen bg-slate-50">
+      {/* HEADER */}
+      <button onClick={(e)=>navigate('/Dashboard')} className="absolute cursor-pointer top-4 right-4 px-4 py-2 bg-red-900 text-white rounded-lg text-sm hover:opacity-90 z-10">Exit</button>
+      <div className="text-center pt-10 px-4">
+        <h1 className="text-3xl font-bold text-slate-900">
+          Workout Splits
+        </h1>
+        <p className="mt-2 text-slate-600 max-w-xl mx-auto">
+          Choose a workout split that matches your goals, schedule, and training style
+        </p>
+      </div>
+
+      {/* GRID */}
+      <div className="max-w-7xl mx-auto p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {splitsData.map((split) => (
           <div
             key={split.id}
-            className="bg-white border rounded-xl shadow-sm p-5 flex flex-col"
+            className="group bg-white rounded-2xl border shadow-sm hover:shadow-xl transition-all duration-300 p-6 flex flex-col"
           >
-            <h3 className="text-lg font-semibold text-slate-800">
+            <h3 className="text-lg font-semibold text-slate-900 group-hover:text-black transition">
               {split.title}
             </h3>
-            <p className="text-sm text-slate-600 mt-2 flex">
+
+            <p className="text-sm text-slate-600 mt-3 leading-relaxed flex-1">
               {split.description}
             </p>
 
             <button
               onClick={() => setSelectedSplit(split)}
-              className="mt-4 rounded-md bg-slate-900 py-2 text-white text-sm hover:bg-slate-700 transition cursor-pointer"
+              className="mt-6 rounded-xl bg-black py-2.5 text-white text-sm font-medium hover:bg-slate-800 transition"
             >
-              Read More
+              View Split
             </button>
           </div>
         ))}
@@ -159,12 +158,15 @@ const WorkoutSplit = () => {
       {/* MODAL */}
       {selectedSplit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-          <div className="bg-white rounded-xl w-full max-w-xl shadow-lg">
+          <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
             {/* Header */}
-            <div className="flex justify-between items-center p-4 border-b">
-              <h2 className="text-lg font-semibold">
+            <div className="p-5 border-b">
+              <h2 className="text-xl font-semibold text-slate-900">
                 {selectedSplit.title}
               </h2>
+              <p className="text-sm text-slate-600 mt-1">
+                Weekly training breakdown
+              </p>
             </div>
 
             {/* Content */}
@@ -172,19 +174,23 @@ const WorkoutSplit = () => {
               {selectedSplit.days.map((item, index) => (
                 <div
                   key={index}
-                  className="flex justify-between bg-slate-100 p-3 rounded-md text-sm"
+                  className="flex justify-between items-center bg-slate-100 px-4 py-3 rounded-xl text-sm"
                 >
-                  <span className="font-medium">{item.day}</span>
-                  <span className="text-slate-700">{item.muscles}</span>
+                  <span className="font-medium text-slate-800">
+                    {item.day}
+                  </span>
+                  <span className="text-slate-600 text-right">
+                    {item.muscles}
+                  </span>
                 </div>
               ))}
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t flex justify-center">
+            <div className="p-4 border-t flex justify-end">
               <button
                 onClick={() => setSelectedSplit(null)}
-                className="bg-red-900 text-white px-4 py-2 rounded-md text-sm hover:bg-red-950"
+                className="rounded-xl bg-red-900 px-5 py-2 text-sm text-white hover:bg-red-950 transition"
               >
                 Close
               </button>
@@ -192,8 +198,9 @@ const WorkoutSplit = () => {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
 export default WorkoutSplit;
+

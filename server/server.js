@@ -7,6 +7,7 @@ const app = express();
 const port = 8080;
 const authRoutes = require('./routes/auth');
 const macrosRoutes = require('./routes/macros');
+const trainerRoutes = require('./routes/trainer');
 connectDB();
 
 app.use(express.json());
@@ -19,7 +20,7 @@ app.get('/',(req,res)=>{
 })
 app.use('/auth',authRoutes);
 app.use('/macros',macrosRoutes);
-
+app.use('/trainer',trainerRoutes);
 app.listen(port,()=>{
     console.log(`Server is listening on port ${port}`);
 });  

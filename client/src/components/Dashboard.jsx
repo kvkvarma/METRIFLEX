@@ -7,19 +7,13 @@ import ProgressWithLabel from "./ProgressWithLabel";
 import Graph from "./Graph";
 import axios from "axios";
 
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
 
 import { useAuth } from "../../context/AuthContext";
 import CaloriesCard from "./CaloriesCard";
 import MacrosCard from "./MacroCard";
 import TodaysPlan from "./TodaysPlan";
+import ChartLineMultiple from "./Chart";
+
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -27,11 +21,10 @@ const Dashboard = () => {
 
   const [dailyMacrosData, setDailyMacrosData] = useState([]);
   const [targetUserGoals, setTargetUserGoals] = useState({});
-  const [displayChart, setDisplayChart] = useState("protein");
+  const [trainers, setTrainers] = useState([]);
 
   useEffect(() => {
     if (!user) return;
-
     const fetchData = async () => {
       try {
         const dailyMacrosResponse = await axios.get(
@@ -43,9 +36,15 @@ const Dashboard = () => {
           "http://localhost:8080/macros/getMacroGoals",
           { params: { user: user.uid } }
         );
-
+        
         setDailyMacrosData(dailyMacrosResponse.data.userDailyMacrosData);
         setTargetUserGoals(userGoalsResponse.data.macroGoals.goal);
+
+      const trainersResponse = await axios.get(
+          "http://localhost:8080/trainer/getTrainers"
+      );
+        console.log("Trainers Data:", trainersResponse.data.trainers);
+        setTrainers(trainersResponse.data.trainers);
       } catch (err) {
         console.error(err.message);
       }
@@ -84,7 +83,7 @@ const Dashboard = () => {
     <main className="flex flex-col p-4 lg:p-6 overflow-hidden gap-6">
       <div className="space-y-6 overflow-y-auto">
         {/* Header */}
-        <div className="flex justify-between items-center bg-gray-300 p-4 rounded-xl">
+        <div className="flex justify-between items-center bg-gray-200 p-4 rounded-xl">
           <div className="flex items-center gap-3">
             <button
               className="lg:hidden p-2 bg-white rounded"
@@ -105,8 +104,7 @@ const Dashboard = () => {
 
           <div className="flex gap-2">
             <div className="w-9 h-9 bg-white rounded-full" />
-            <div className="w-9 h-9 bg-white rounded-full" />
-            <div className="w-9 h-9 bg-white rounded-full hidden sm:block" />
+           
           </div>
         </div>
 
@@ -175,30 +173,30 @@ const Dashboard = () => {
         </section>
       </div>
       {/*================= BOTTOM CONTENT =================*/}
-<div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0 ">
+<div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4 min-h-0">
   {/* Trainers */}
-  <div className="bg-white rounded-2xl p-4 shadow-sm flex flex-col">
+  <div className="bg-white rounded-2xl p-4 shadow-sm flex flex-col ">
     <div className="flex justify-between items-center mb-4">
       <h2 className="font-semibold text-gray-800">Popular trainer</h2>
-      <span className="text-sm text-gray-400">Cardio</span>
+      <button className="text-sm text-gray-400 border-2 p-1 rounded-xl cursor-pointer">View More</button>
     </div>
 
-    <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4 overflow-hidden">
+    <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 overflow-hidden">
       {/* Trainer Card */}
-     <div className="h-48 lg:h-72 rounded-xl bg-gradient-to-b from-red-800 to-red-600 text-white p-4 flex flex-col overflow-hidden">
+     <div className="h-48 lg:h-full rounded-xl bg-gradient-to-b from-red-800 to-red-600 text-white p-4 flex flex-col overflow-hidden">
     <div>
       <h3 className="font-normal text-lg">Adam Smith</h3>
-      <p className="my-3 text-xs opacity-80 max-h-16 lg:max-h-40 overflow-y-auto pr-1">
+      <p className="my-3 text-xs opacity-80 max-h-12 lg:max-h-32 overflow-y-auto pr-1">
         MMA Expert With 10 Years of Ex perience in Training Professional Fighters. MMA Expert With 10 Years of Ex perience in Training Professional Fighters. MMA Expert With 10 Years of Ex perience in Training Professional Fighters.MMA Expert With 10 Years of Ex perience in Training Professional Fighters.MMA Expert With 10 Years of Ex perience in Training Professional Fighters.
       </p>
     </div>
-  <button className="text-xs bg-white/20 rounded-lg py-2 mt-auto">
-    View profile
-  </button>
-</div>
+    <button className="text-xs bg-white/20 rounded-lg py-2 mt-auto">
+      View profile
+    </button>
+    </div>
 
 
-      <div className="h-48 lg:h-72 rounded-xl bg-gradient-to-b from-green-800 to-green-600 text-white p-4 flex flex-col justify-between">
+      <div className="h-48 lg:h-full rounded-xl bg-gradient-to-b from-green-800 to-green-600 text-white p-4 flex flex-col justify-between">
          <div>
           <h3 className="font-normal text-lg">Adam Smith</h3>
           <p className="my-3 text-xs opacity-80 max-h-16 lg:max-h-40 overflow-y-auto pr-1">
@@ -210,7 +208,7 @@ const Dashboard = () => {
         </button>
       </div>
 
-      <div className="h-48 lg:h-72 rounded-xl bg-gradient-to-b from-black to-gray-800 text-white p-4 flex flex-col justify-between">
+      {/* <div className="h-48 lg:h-72 rounded-xl bg-gradient-to-b from-black to-gray-800 text-white p-4 flex flex-col justify-between">
          <div>
           <h3 className="font-normal text-lg">Adam Smith</h3>
           <p className="my-3 text-xs opacity-80 max-h-16 lg:max-h-40 overflow-y-auto pr-1">
@@ -220,12 +218,16 @@ const Dashboard = () => {
         <button className="text-xs bg-white/20 rounded-lg py-2">
           View profile
         </button>
-      </div>
+      </div> */}
     </div>
   </div>
 
-  {/* Workout Statistics */}
-  <div className="bg-white rounded-2xl p-5 shadow-sm flex flex-col">
+  <div className="bg-white rounded-2xl p-5 shadow-sm flex flex-col ">
+        <ChartLineMultiple/>
+  </div>
+
+<div className="flex flex-col gap-2">
+ <div className="bg-white rounded-2xl p-5 shadow-sm flex flex-col flex-2">  
     <div className="flex justify-between items-center mb-4">
       <h2 className="font-semibold text-gray-800">Workout Statistics</h2>
       <span className="text-sm text-gray-400">Weekly</span>
@@ -243,6 +245,31 @@ const Dashboard = () => {
       <ProgressWithLabel />
     </div>
   </div>
+  <div className="flex-1">
+    <button className="p-3 flex justify-center items-center bg-gray-200 w-full rounded-full">Submiut Daily Report</button>
+  </div>
+</div>
+
+  {/* Workout Statistics */}
+  {/* <div className="bg-white rounded-2xl p-5 shadow-sm flex flex-col">
+    <div className="flex justify-between items-center mb-4">
+      <h2 className="font-semibold text-gray-800">Workout Statistics</h2>
+      <span className="text-sm text-gray-400">Weekly</span>
+    </div
+
+    <div className="flex-1 flex items-center justify-center">
+      <div className="w-40 h-40 rounded-full border-[12px] border-lime-400 flex flex-col items-center justify-center">
+        <span className="text-xl font-bold">35 min</span>
+        <span className="text-sm text-gray-500">350 calories</span>
+      </div>
+    </div>
+
+    <div className="space-y-3 mt-6">
+      <ProgressWithLabel />
+      <ProgressWithLabel />
+    </div>
+  </div> */}
+  
 </div>
 
     </main>

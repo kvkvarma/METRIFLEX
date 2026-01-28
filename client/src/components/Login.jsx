@@ -1,9 +1,10 @@
 import React,{ useState } from 'react'
+import Dashboard from './Dashboard';
+import TrainerDashboard from './TrainerDashboard';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup} from 'firebase/auth';
 import { auth } from '../auth/firebase';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
-import Dashboard from './Dashboard';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
@@ -23,15 +24,35 @@ const Login = () => {
         email,
         password
       );
+      
       const token = await userCredential.user.getIdToken();
-      await axios.post("http://localhost:8080/auth/register", {
-        token,
-        email,
-        username,
-        role
-      });
+
+      if(role === 'trainer'){
+        console.log("Registering as trainer");
+        const res = await axios.post('http://localhost:8080/auth/trainerregister', {
+          token,
+          email,
+          username
+        });
+        console.log(res.data);
+      }
+      else{
+        const res = await axios.post("http://localhost:8080/auth/register", {
+          token,
+          email,
+          username,
+          role
+        });
+        console.log(res.data);
+      }
       setUser({ uid: userCredential.user.uid });
-      navigate('/Dashboard');
+
+      if(role === 'trainer') {
+        navigate('/TrainerDashboard');
+      } else {
+        navigate('/Dashboard');
+      }
+
     } catch (error) {
       console.error(error.code, error.message);
     }
@@ -45,9 +66,15 @@ const Login = () => {
         password
       );
       const token = await userLoggedIn.user.getIdToken();
-      await axios.post("http://localhost:8080/auth/login", { token });
+      if(role === 'trainer'){
+        const res = await axios.post("http://localhost:8080/auth/trainerlogin", { token });
+        if(res.data.user) navigate('/TrainerDashboard');
+      }
+      else{
+        const res = await axios.post("http://localhost:8080/auth/login", { token });
+        if(res.data.user) navigate('/Dashboard');
+      }
       setUser({ uid: userLoggedIn.user.uid });
-      navigate('/Dashboard');
     } catch (error) {
       console.error(error.code, error.message);
     }
@@ -88,7 +115,15 @@ const Login = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-
+         Login As <select
+              className="w-full mb-3 p-2 border rounded"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <option value="user">User</option>
+              <option value="trainer">Trainer</option>
+            </select>
+        
         {mode === "register" && (
           <>
             <input

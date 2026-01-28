@@ -21,7 +21,7 @@ const Sidebar = () => {
 
       {/* SIDEBAR */}
       <aside
-        className={`fixed lg:static z-50 top-0 left-0 h-screen w-20 bg-gray-300
+        className={`fixed lg:static z-50 top-0 left-0 h-screen w-20 bg-gray-200
             flex flex-col items-center py-6 space-y-6
             transform transition-transform duration-300
             ${open ? "translate-x-0" : "-translate-x-full"} 
@@ -30,23 +30,23 @@ const Sidebar = () => {
       >
         <div className="w-10 h-10 bg-gray-700 rounded-xl" />
 
-        <NavLink to="/" className="flex flex-col items-center text-xs gap-1">
-          <LuLayoutDashboard size={25} />
+        <NavLink to="/Dashboard" className="flex flex-col items-center text-xs gap-1">
+          <LuLayoutDashboard size={25} color="#818589"/>
           Dashboard
         </NavLink>
 
         <NavLink to="/trainers" className="flex flex-col items-center text-xs gap-1">
-          <FaPeopleGroup size={25} />
+          <FaPeopleGroup size={25} color="#818589"/>
           Trainers
         </NavLink>
 
         <NavLink to="/workoutsplits" className="flex flex-col items-center text-xs gap-1">
-          <MdHorizontalSplit size={25} />
+          <MdHorizontalSplit size={25} color="#818589"/>
           Splits
         </NavLink>
 
         <NavLink to="/macros" className="flex flex-col items-center text-xs gap-1">
-          <GiForkKnifeSpoon size={25} />
+          <GiForkKnifeSpoon size={25} color="#818589"/>
           Macros
         </NavLink>
       </aside>

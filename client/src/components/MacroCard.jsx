@@ -55,7 +55,7 @@ const MacroCard = ({ todayMacros, macroGoals }) => {
   return (
     <div className="flex items-center gap-8 bg-white p-6 rounded-xl shadow hover:shadow-lg transition-shadow lg:col-span-2">
       {/* 🔵 CIRCLE */}
-      <div className="relative w-44 h-44">
+      <div className="relative w-48 h-40">
         <svg
           viewBox="0 0 220 220"
           className="-rotate-90 w-full h-full"
