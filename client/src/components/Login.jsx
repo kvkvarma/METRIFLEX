@@ -59,26 +59,42 @@ const Login = () => {
   };
 
   const handleLogin = async () => {
-    try {
-      const userLoggedIn = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
+  try {
+    const userLoggedIn = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+
+    const token = await userLoggedIn.user.getIdToken();
+
+    if (role === "trainer") {
+      const res = await axios.post(
+        "http://localhost:8080/auth/trainerlogin",
+        { token }
       );
-      const token = await userLoggedIn.user.getIdToken();
-      if(role === 'trainer'){
-        const res = await axios.post("http://localhost:8080/auth/trainerlogin", { token });
-        if(res.data.user) navigate('/TrainerDashboard');
+
+      if (res.data.trainer) {
+        // setUser({ uid: userCredential.user.uid });
+        navigate("/TrainerDashboard");
       }
-      else{
-        const res = await axios.post("http://localhost:8080/auth/login", { token });
-        if(res.data.user) navigate('/Dashboard');
+    } else {
+      const res = await axios.post(
+        "http://localhost:8080/auth/login",
+        { token }
+      );
+
+      if (res.data.user) {
+        // setUser({uid:userLoggedIn.user.uid});
+        navigate("/Dashboard");
       }
-      setUser({ uid: userLoggedIn.user.uid });
-    } catch (error) {
-      console.error(error.code, error.message);
     }
-  };
+    setUser({uid:userLoggedIn.user.uid});
+  } catch (error) {
+    console.error(error.code, error.message);
+  }
+};
+
 
   const googleSignin = async () => {
     try {

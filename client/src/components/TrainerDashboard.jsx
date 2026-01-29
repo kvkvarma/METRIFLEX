@@ -1,7 +1,38 @@
-import React from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { useAuth } from "../../context/AuthContext";
+import axios from 'axios';
 import StatCard from './StatCard'
 import ClientRow from './ClientRow'
+import RequestRow from './RequestRow';
+
 const TrainerDashboard = () => {
+  const [clientRequests,setClientRequests] = useState([]);
+  const {user} = useAuth();
+  useEffect(() => {
+  const fetchRequests = async () => {
+    if (!user?.uid) return;
+
+    try {
+      const response = await axios.get(
+        "http://localhost:8080/trainer/gettrainerrequests",
+        {
+          params: { id: user.uid }
+        }
+      );
+
+      console.log(response.data.requests);
+      setClientRequests(response.data.requests);
+    } catch (err) {
+      console.log(
+        "Error fetching client requests to trainer:",
+        err.response?.data || err.message
+      );
+    }
+  };
+  fetchRequests();
+}, [user]);
+
+
   return (
    <div className="min-h-screen bg-gray-100 flex flex-col">
 
@@ -47,16 +78,32 @@ const TrainerDashboard = () => {
           </div>
 
           {/* ===== CLIENTS LIST ===== */}
-          <div className="bg-white rounded-xl p-4 flex-1 overflow-hidden">
-            <h2 className="font-semibold mb-4">Active Clients</h2>
-
-            <div className="space-y-3 overflow-y-auto h-full pr-2">
+          <div className="bg-white rounded-xl p-4 grid grid-cols-1 lg:grid-cols-2 gap-3 overflow-hidden">
+            <div className="space-y-2 overflow-y-auto h-full pr-2">
+              <h2 className="font-semibold mb-4">Active Clients</h2>
               <ClientRow name="Alex Johnson" goal="Fat Loss" status="On Track" />
               <ClientRow name="Maria Smith" goal="Muscle Gain" status="Needs Attention" />
               <ClientRow name="David Lee" goal="Endurance" status="On Track" />
               <ClientRow name="Riya Patel" goal="Weight Loss" status="On Track" />
               <ClientRow name="John Doe" goal="Rehab" status="Needs Attention" />
             </div>
+
+            <div className="space-y-2 overflow-y-auto h-full pr-2">
+              <h2 className="font-semibold mb-4">Client Requests</h2>
+              {clientRequests.length === 0 ? (
+                <p className="text-sm text-gray-500">No pending requests</p>
+              ) : (
+                clientRequests.map((item) => (
+                  <RequestRow
+                    key={item.userId}
+                    name={item.name}
+                    goal={item.goal}
+                    status="Pending"
+                  />
+                ))
+              )}
+            </div>
+
           </div>
 
         </section>

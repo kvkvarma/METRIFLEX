@@ -37,9 +37,9 @@ router.post('/trainerregister', async (req, res) => {
             return res.status(401).json({message: "Unauthorized"});
     }
     const uid = decoded.uid;
-    let user = await Trainer.findOne({ trainerId: uid });
-    if (!user) {
-      user = await Trainer.create({
+    let trainer = await Trainer.findOne({ trainerId: uid });
+    if (!trainer) {
+      trainer = await Trainer.create({
         trainerId: uid,
         email: req.body.email,
         name: req.body.username || "Anonymous",
@@ -47,10 +47,10 @@ router.post('/trainerregister', async (req, res) => {
         description: "",
         experience: 0,
         speciality: "",
-        clients: [{}]
       });
       console.log("Trainer Created");
     }
+    
     res.status(200).json({ message: "Trainer registered successfully" });
   } catch (err) {
     console.error("FAILED:", err.message);
@@ -114,12 +114,12 @@ router.post('/trainerlogin',async(req,res)=>{
             return res.status(401).json({message: "Unauthorized"});
         }
         const uid = decoded.uid;
-        const user = await Trainer.findOne({trainerId : uid});
-        if(!user){
+        const trainer = await Trainer.findOne({trainerId : uid});
+        if(!trainer){
           res.status(404).json({message: "Trainer not found"});
         }
         else{
-            res.status(200).json({user});
+            res.status(200).json({trainer});
         }
     }
     catch(err){
