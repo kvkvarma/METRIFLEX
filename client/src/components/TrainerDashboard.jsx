@@ -3,15 +3,15 @@ import { useAuth } from "../../context/AuthContext";
 import axios from 'axios';
 import StatCard from './StatCard'
 import ClientRow from './ClientRow'
-import RequestRow from './RequestRow';
+
 
 const TrainerDashboard = () => {
   const [clientRequests,setClientRequests] = useState([]);
   const {user} = useAuth();
+
   useEffect(() => {
   const fetchRequests = async () => {
     if (!user?.uid) return;
-
     try {
       const response = await axios.get(
         "http://localhost:8080/trainer/gettrainerrequests",
@@ -32,6 +32,32 @@ const TrainerDashboard = () => {
   fetchRequests();
 }, [user]);
 
+    const addToClient = async(id,name,goal,plan)=>{
+      try{
+        const response = await axios.post("http://localhost:8080/trainer/addclienttotrainer",
+          {
+            trainerID:user.uid,
+            userId:id,
+            name:name,
+            goal:goal,
+          }
+        );
+        await removeClientRequest(id);
+      }
+      catch(err){
+        console.log("Error Message : ",err.message);
+      }
+    }
+
+    const removeClientRequest = async(id)=>{
+      try{
+        const response = await axios.post("http://localhost:8080/trainer/removeclientrequests",{trainerID:user.uid,id:id});
+        setClientRequests(prev=>prev.filter(req => req.userId !== id));
+      }
+      catch(err){
+        console.log("Error Message : ",err.message)
+      }
+    }
 
   return (
    <div className="min-h-screen bg-gray-100 flex flex-col">
@@ -94,12 +120,21 @@ const TrainerDashboard = () => {
                 <p className="text-sm text-gray-500">No pending requests</p>
               ) : (
                 clientRequests.map((item) => (
-                  <RequestRow
-                    key={item.userId}
-                    name={item.name}
-                    goal={item.goal}
-                    status="Pending"
-                  />
+                  <div key={item.userId} className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
+                  <div>
+                    <p className="font-medium">{item.name}</p>
+                    <p className="text-xs text-gray-500">{item.goal}</p>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <button onClick = {()=>addToClient(item.userId,item.name,item.goal,item.plan)} className="text-xs bg-green-900 text-white px-3 py-1 rounded">
+                      Accept
+                    </button>
+                    <button onClick = {()=>removeClientRequest(item.userId)} className="text-xs bg-red-900 text-white px-3 py-1 rounded">
+                      Reject
+                    </button>
+                  </div>
+                </div>
                 ))
               )}
             </div>

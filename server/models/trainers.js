@@ -11,6 +11,7 @@ const clientRequests = new Schema({
 const clientsAssigned = new Schema({
     userId : {type : String, required:true},
     name : {type : String},
+    goal : {type : String}
 })
 
 const trainerSchema = new Schema({
