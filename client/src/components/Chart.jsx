@@ -1,5 +1,5 @@
-"use client"
-
+// "use client"
+import { useState } from "react"
 import * as React from "react"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 
@@ -28,56 +28,63 @@ import {
 
 export const description = "An interactive area chart"
 
-const chartData = [
-  { date: "2024-04-01", desktop: 222, mobile: 150 },
-  { date: "2024-04-02", desktop: 97, mobile: 180 },
-  { date: "2024-04-03", desktop: 167, mobile: 120 },
-  { date: "2024-04-04", desktop: 242, mobile: 260 },
-  { date: "2024-04-05", desktop: 373, mobile: 290 },
-  { date: "2024-04-06", desktop: 301, mobile: 340 },
-  { date: "2024-04-07", desktop: 245, mobile: 180 },
-  { date: "2024-04-08", desktop: 409, mobile: 320 },
-  { date: "2024-04-09", desktop: 59, mobile: 110 },
-  { date: "2024-04-10", desktop: 261, mobile: 190 },
-  { date: "2024-04-11", desktop: 327, mobile: 350 },
-  { date: "2024-04-12", desktop: 292, mobile: 210 },
-  { date: "2024-04-13", desktop: 342, mobile: 380 },
-  { date: "2024-04-14", desktop: 137, mobile: 220 },
-  { date: "2024-04-15", desktop: 120, mobile: 170 },
-  { date: "2024-04-16", desktop: 138, mobile: 190 },
-  { date: "2024-04-17", desktop: 446, mobile: 360 },
-  { date: "2024-04-18", desktop: 364, mobile: 410 },
-  { date: "2024-04-19", desktop: 243, mobile: 180 },
-  { date: "2024-04-20", desktop: 89, mobile: 150 },
-  { date: "2024-04-21", desktop: 137, mobile: 200 },
-  { date: "2024-04-22", desktop: 224, mobile: 170 },
-  { date: "2024-04-23", desktop: 138, mobile: 230 },
-  { date: "2024-04-24", desktop: 387, mobile: 290 },
-  { date: "2024-04-25", desktop: 215, mobile: 250 },
-  { date: "2024-04-26", desktop: 184, mobile: 280 },
-  { date: "2024-04-27", desktop: 256, mobile: 195 },
-  { date: "2024-04-28", desktop: 312, mobile: 240 },
-  { date: "2024-04-29", desktop: 198, mobile: 310 },
-  { date: "2024-04-30", desktop: 275, mobile: 220 }
-]
+// const chartData = [
+//   { date: "2024-04-01", steps: 222, caloriesburned: 150 },
+//   { date: "2024-04-02", steps: 97, caloriesburned: 180 },
+//   { date: "2024-04-03", steps: 167, caloriesburned: 120 },
+//   { date: "2024-04-04", steps: 242, caloriesburned: 260 },
+//   { date: "2024-04-05", steps: 373, caloriesburned: 290 },
+//   { date: "2024-04-06", steps: 301, caloriesburned: 340 },
+//   { date: "2024-04-07", steps: 245, caloriesburned: 180 },
+//   { date: "2024-04-08", steps: 409, caloriesburned: 320 },
+//   { date: "2024-04-09", steps: 59, caloriesburned: 110 },
+//   { date: "2024-04-10", steps: 261, caloriesburned: 190 },
+//   { date: "2024-04-11", steps: 327, caloriesburned: 350 },
+//   { date: "2024-04-12", steps: 292, caloriesburned: 210 },
+//   { date: "2024-04-13", steps: 342, caloriesburned: 380 },
+//   { date: "2024-04-14", steps: 137, caloriesburned: 220 },
+//   { date: "2024-04-15", steps: 120, caloriesburned: 170 },
+//   { date: "2024-04-16", steps: 138, caloriesburned: 190 },
+//   { date: "2024-04-17", steps: 446, caloriesburned: 360 },
+//   { date: "2024-04-18", steps: 364, caloriesburned: 410 },
+//   { date: "2024-04-19", steps: 243, caloriesburned: 180 },
+//   { date: "2024-04-20", steps: 89, caloriesburned: 150 },
+//   { date: "2024-04-21", steps: 137, caloriesburned: 200 },
+//   { date: "2024-04-22", steps: 224, caloriesburned: 170 },
+//   { date: "2024-04-23", steps: 138, caloriesburned: 230 },
+//   { date: "2024-04-24", steps: 387, caloriesburned: 290 },
+//   { date: "2024-04-25", steps: 215, caloriesburned: 250 },
+//   { date: "2024-04-26", steps: 184, caloriesburned: 280 },
+//   { date: "2024-04-27", steps: 256, caloriesburned: 195 },
+//   { date: "2024-04-28", steps: 312, caloriesburned: 240 },
+//   { date: "2024-04-29", steps: 198, caloriesburned: 310 },
+//   { date: "2024-04-30", steps: 275, caloriesburned: 220 }
+// ]
 
 const chartConfig = {
   visitors: {
     label: "Visitors",
   },
-  desktop: {
-    label: "Desktop",
+  steps: {
+    label: "Water",
     color: "var(--chart-1)",
   },
-  mobile: {
-    label: "Mobile",
+  caloriesburned: {
+    label: "Calories Burned",
     color: "var(--chart-2)",
   },
 }
 
-export function ChartAreaInteractive() {
-  const [timeRange, setTimeRange] = React.useState("30d")
+export function ChartAreaInteractive({details}) {
 
+  const [timeRange, setTimeRange] = useState("30d");
+
+  const chartData = details.map((item)=>({
+    date : item.date.split('T')[0],
+    steps:item.steps,
+    caloriesburned : item.caloriesburned
+  }))
+  console.log("Chart Data : ",chartData)
   const filteredData = chartData.filter((item) => {
     const date = new Date(item.date)
     const referenceDate = new Date("2024-04-30")
@@ -122,27 +129,27 @@ export function ChartAreaInteractive() {
         >
           <AreaChart data={filteredData}>
             <defs>
-              <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="fillsteps" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="var(--color-desktop)"
+                  stopColor="var(--color-steps)"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-desktop)"
+                  stopColor="var(--color-steps)"
                   stopOpacity={0.1}
                 />
               </linearGradient>
-              <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="fillcaloriesburned" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="var(--color-mobile)"
+                  stopColor="var(--color-caloriesburned)"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-mobile)"
+                  stopColor="var(--color-caloriesburned)"
                   stopOpacity={0.1}
                 />
               </linearGradient>
@@ -177,17 +184,17 @@ export function ChartAreaInteractive() {
               }
             />
             <Area
-              dataKey="mobile"
+              dataKey="caloriesburned"
               type="natural"
-              fill="url(#fillMobile)"
-              stroke="var(--color-mobile)"
+              fill="url(#fillcaloriesburned)"
+              stroke="var(--color-caloriesburned)"
               stackId="a"
             />
             <Area
-              dataKey="desktop"
+              dataKey="steps"
               type="natural"
-              fill="url(#fillDesktop)"
-              stroke="var(--color-desktop)"
+              fill="url(#fillsteps)"
+              stroke="var(--color-steps)"
               stackId="a"
             />
             <ChartLegend content={<ChartLegendContent />} />

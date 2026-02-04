@@ -8,18 +8,16 @@ const SmallProgressCircle = ({ percentage, achieved, total }) => {
   const CIRC = 2 * Math.PI * RADIUS;
   const dash = (percentage / 100) * CIRC;
 
-  // Dynamic color based on progress
   const getProgressColor = () => {
-    if (percentage >= 75) return "#10B981"; // green
-    if (percentage >= 50) return "#F59E0B"; // amber
-    if (percentage >= 25) return "#3B82F6"; // blue
-    return "#EF4444"; // red
+    if (percentage >= 75) return "#10B981"; 
+    if (percentage >= 50) return "#F59E0B";
+    if (percentage >= 25) return "#3B82F6"; 
+    return "#EF4444"; 
   };
 
   return (
     <div className="relative w-14 h-14 flex-shrink-0">
       <svg viewBox="0 0 50 50" className="-rotate-90">
-        {/* Background circle with subtle shadow effect */}
         <circle
           cx="25"
           cy="25"
@@ -108,7 +106,7 @@ const TodaysPlan = ({ userGoals, todayEntry }) => {
 
       {/* Right side - Action Button */}
       <button
-        onClick={() => navigate("/workoutsplits")}
+        onClick={() => navigate("/todaymetrics")}
         className="flex items-center gap-2 bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-800 hover:to-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95 flex-shrink-0"
       >
         <Plus className="w-4 h-4" />

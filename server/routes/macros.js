@@ -57,7 +57,6 @@ router.get('/getDailyMacros', async (req, res) => {
 router.get('/getMAcroGoals', async (req, res) => {
   try {
     const userId = req.query.user;
-
     if (!userId) {
       return res.status(400).json({ error: "UserID Required!" });
     }
@@ -75,16 +74,35 @@ router.get('/getMAcroGoals', async (req, res) => {
   }
 });
 
+router.post('/addtodaymetrics',async(req,res)=>{
+  try{
+    const {userId,water,steps,bpm,sleep} = req.body;
+    const date = new Date().toISOString().split('T')[0];
+    if(!userId){
+      return res.status(400).json({error : "UserId Required!"});
+    }
+    await DailyMacros.findOneAndUpdate({userId,date},{
+      $inc:{
+        sleep:sleep,
+        steps:steps,
+        water:water
+      }
+    },{ upsert: true, new: true })
+    return res.status(200).json({message: "Cardio Metrics Added Successfully!"});
+  }
+  catch(err){
+    return res.status(500).json({err:"Failed to addC Cardio Metrics"})
+  }
+})
+
 router.post('/addFoodMacros', async (req, res) => {
   try {
     const { macros, userId } = req.body;
-
     if (!macros || !userId) {
       return res.status(400).json({ error: "Invalid request data" });
     }
-
+    console.log("Carbs : ",macros.carbs);
     const date = new Date().toISOString().split('T')[0];
-
     await DailyMacros.findOneAndUpdate(
       { userId, date },
       {

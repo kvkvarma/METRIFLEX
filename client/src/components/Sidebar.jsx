@@ -15,6 +15,7 @@ const Sidebar = () => {
     { to: "/trainers", icon: FaPeopleGroup, label: "Trainers" },
     { to: "/workoutsplits", icon: MdHorizontalSplit, label: "Splits" },
     { to: "/macros", icon: GiForkKnifeSpoon, label: "Macros" },
+    { to: "/todaymetrics", icon: GiForkKnifeSpoon, label: "Metrics" },
   ];
 
   return (

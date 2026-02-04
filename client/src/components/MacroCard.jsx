@@ -160,13 +160,13 @@ const MacroRow = ({ label, color, percent, diff }) => (
     </div>
 
     <div className="text-right">
-      <div className="font-medium">{percent.toFixed(1)}%</div>
+      {/* <div className="font-medium">{percent.toFixed(1)}%</div> */}
       {diff >= 0 ? (
-        <div className="text-green-500 text-sm">
+        <div className="text-green-500 text-sm font-bold">
           +{diff.toFixed(1)}%
         </div>
       ) : (
-        <div className="text-red-400 text-sm">
+        <div className="text-red-400 text-sm font-bold">
           -{Math.abs(diff).toFixed(1)}%
         </div>
       )}

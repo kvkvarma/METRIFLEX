@@ -22,7 +22,7 @@ const Macros = () => {
       );
 
       const nutrients = response.data.nutrients;
-
+      console.log(response.data.nutrients);
       setMacros({
         protein: parseInt(
           nutrients.find(n => n.nutrientName === "Protein")?.value || 0

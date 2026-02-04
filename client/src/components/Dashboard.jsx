@@ -60,6 +60,7 @@ const Dashboard = () => {
     steps: item.steps,
     sleep: item.sleep,
     water: item.water,
+    caloriesburned:item.caloriesburned
   }));
 
   const userGoals = {
@@ -175,7 +176,7 @@ const Dashboard = () => {
             
             {/* Chart Section */}
             <div className="bg-white rounded-2xl p-3 shadow-sm lg:min-h-0">
-              <ChartAreaInteractive />
+              <ChartAreaInteractive details = {newMacros} />
             </div>
 
             {/* Workout Statistics */}
