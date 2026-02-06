@@ -28,39 +28,6 @@ import {
 
 export const description = "An interactive area chart"
 
-// const chartData = [
-//   { date: "2024-04-01", steps: 222, caloriesburned: 150 },
-//   { date: "2024-04-02", steps: 97, caloriesburned: 180 },
-//   { date: "2024-04-03", steps: 167, caloriesburned: 120 },
-//   { date: "2024-04-04", steps: 242, caloriesburned: 260 },
-//   { date: "2024-04-05", steps: 373, caloriesburned: 290 },
-//   { date: "2024-04-06", steps: 301, caloriesburned: 340 },
-//   { date: "2024-04-07", steps: 245, caloriesburned: 180 },
-//   { date: "2024-04-08", steps: 409, caloriesburned: 320 },
-//   { date: "2024-04-09", steps: 59, caloriesburned: 110 },
-//   { date: "2024-04-10", steps: 261, caloriesburned: 190 },
-//   { date: "2024-04-11", steps: 327, caloriesburned: 350 },
-//   { date: "2024-04-12", steps: 292, caloriesburned: 210 },
-//   { date: "2024-04-13", steps: 342, caloriesburned: 380 },
-//   { date: "2024-04-14", steps: 137, caloriesburned: 220 },
-//   { date: "2024-04-15", steps: 120, caloriesburned: 170 },
-//   { date: "2024-04-16", steps: 138, caloriesburned: 190 },
-//   { date: "2024-04-17", steps: 446, caloriesburned: 360 },
-//   { date: "2024-04-18", steps: 364, caloriesburned: 410 },
-//   { date: "2024-04-19", steps: 243, caloriesburned: 180 },
-//   { date: "2024-04-20", steps: 89, caloriesburned: 150 },
-//   { date: "2024-04-21", steps: 137, caloriesburned: 200 },
-//   { date: "2024-04-22", steps: 224, caloriesburned: 170 },
-//   { date: "2024-04-23", steps: 138, caloriesburned: 230 },
-//   { date: "2024-04-24", steps: 387, caloriesburned: 290 },
-//   { date: "2024-04-25", steps: 215, caloriesburned: 250 },
-//   { date: "2024-04-26", steps: 184, caloriesburned: 280 },
-//   { date: "2024-04-27", steps: 256, caloriesburned: 195 },
-//   { date: "2024-04-28", steps: 312, caloriesburned: 240 },
-//   { date: "2024-04-29", steps: 198, caloriesburned: 310 },
-//   { date: "2024-04-30", steps: 275, caloriesburned: 220 }
-// ]
-
 const chartConfig = {
   visitors: {
     label: "Visitors",

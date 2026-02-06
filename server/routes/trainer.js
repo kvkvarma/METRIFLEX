@@ -32,6 +32,9 @@ router.post('/addrequest',async(req,res)=>{
             age,
             proficiency,
         })
+        await Trainers.findOneAndUpdate({trainerId:id},
+            { $inc: { totalrequests: 1 } }
+        )
         await trainer.save();
 
         return res.status(201).json({
@@ -51,7 +54,17 @@ router.get('/gettrainerrequests',async(req,res)=>{
             return res.status(400).json({message:"Trainer Not Found"});
         }
         const clientRequests = trainer.requests;
-        return res.status(200).json({requests:clientRequests,message:"Requests Fetched Successfully"});
+        const activeClients = trainer.clients;
+        const totalReuqests = trainer.totalrequests;
+        const rejectedRequests = trainer.rejectedrequests;
+        const totalActiveClients = trainer.totalactiveclients;
+        return res.status(200).json({
+            requests:clientRequests,
+            activeclients:activeClients,
+            totalReuqests:totalReuqests,
+            rejectedRequests:rejectedRequests,
+            totalActiveClients:totalActiveClients,
+            message:"Requests Fetched Successfully"});
     }
     catch(err){
         console.log("Error fetch the requests from DB");
@@ -71,8 +84,11 @@ router.post('/addclienttotrainer',async(req,res)=>{
             name:name,
             goal:goal,
         })
+        await Trainers.findOneAndUpdate({trainerId:trainerID},
+            { $inc: { totalactiveclients: 1 } }
+        )
         await trainer.save();
-        return res.status(200).json({message : "Client Assigned Successfully"});
+        return res.status(200).json({newClient : {userId,name,goal},message : "Client Assigned Successfully"});
     }
     catch(err){
         console.log("Error fetching the results");
@@ -94,6 +110,9 @@ router.post('/removeclientrequests', async (req, res) => {
             return res.status(404).json({message : "Request not found"});
         }
         trainer.requests.splice(requireIndex,1);
+        await Trainers.findOneAndUpdate({trainerId:trainerID},
+            { $inc: { rejectedrequests: 1 } }
+        )
         await trainer.save();
         return res.status(200).json({message:"Request removed successfully",res:"true"});
 

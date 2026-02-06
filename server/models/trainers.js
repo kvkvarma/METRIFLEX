@@ -21,6 +21,11 @@ const trainerSchema = new Schema({
     speciality: { type: String },
     description: { type: String },
     status: { type: String, default: 'active' },
+
+    totalrequests : {type:Number,default:0},
+    rejectedrequests : {type:Number,default:0},
+    totalactiveclients : {type:Number,default:0},
+
     clients: { type: [clientsAssigned], default: [] },
     requests : {type : [clientRequests],default:[]}
 }, { timestamps: true });
