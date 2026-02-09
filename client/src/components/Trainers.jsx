@@ -81,51 +81,81 @@ const Trainers = () => {
           </p>
         </div>
 
-        <div className="max-w-7xl mx-auto p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {trainers.map((item) => (
-            <div
-              key={item.trainerId}
-              className="group rounded-2xl bg-white shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
-            >
-              <div className="overflow-hidden">
-                <img
-                  src="/trainer3.jpg"
-                  alt="Trainer"
-                  className="h-52 w-full object-fill group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
+       <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+  {trainers.map((item) => (
+    <div
+      key={item.trainerId}
+      className="group bg-white rounded-2xl border border-gray-200 shadow-sm
+                 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+    >
+      <div className="p-6 flex flex-col h-full">
 
-              <div className="p-5 space-y-3">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    {item?.name}
-                  </h2>
-                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                    {item?.status}
-                  </span>
-                </div>
+        {/* HEADER */}
+        <div className="flex items-start justify-between mb-3">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">
+              John Fitness
+            </h2>
+            <p className="text-sm text-gray-500">
+              5 yrs experience
+            </p>
+          </div>
 
-                <p className="text-sm text-gray-600">
-                  {item?.experience} years •{" "}
-                  <span className="text-red-500">
-                    {item?.speciality}
-                  </span>
-                </p>
-
-                <p className="text-sm h-14 overflow-auto text-gray-500 line-clamp-3">
-                  {item?.description}
-                </p>
-
-                <button
-                  onClick={() => fillDetails(item.trainerId)}
-                  className="mt-4 w-full rounded-xl bg-black py-2.5 text-sm font-medium text-white hover:bg-gray-800 transition"
-                >
-                  Assign Trainer
-                </button>
-              </div>
-            </div>
-          ))}
+          <span className="text-xs font-medium px-3 py-1 rounded-full bg-green-100 text-green-700">
+            Available
+          </span>
         </div>
+
+        {/* META INFO */}
+        <div className="flex flex-wrap gap-2 mb-3">
+          <span className="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded-full">
+            Age: 28
+          </span>
+          <span className="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded-full">
+            Male
+          </span>
+          <span className="text-xs bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full">
+            ⭐ 4.8
+          </span>
+        </div>
+
+        {/* SPECIALITY */}
+        <span className="inline-block w-fit text-xs font-medium bg-red-100 text-red-600 px-3 py-1 rounded-full mb-3">
+          Weight Loss
+        </span>
+
+        {/* DESCRIPTION */}
+        <p className="text-sm text-gray-600 leading-relaxed line-clamp-3 flex-grow">
+          Certified personal trainer specializing in fat loss, strength
+          training, and sustainable lifestyle changes.
+        </p>
+
+        {/* CONTACT */}
+        <div className="mt-4 text-sm text-gray-700">
+          <p>
+            <span className="font-medium">Contact:</span>{" "}
+            +91 98765 43210
+          </p>
+        </div>
+
+        {/* DIVIDER */}
+        <div className="my-4 border-t border-gray-100" />
+
+        {/* CTA */}
+        <button
+          onClick={() => fillDetails(item.trainerId)}
+          className="w-full rounded-xl bg-black py-2.5 text-sm font-medium 
+                     text-white hover:bg-gray-800 transition"
+        >
+          Assign Trainer
+        </button>
+
+      </div>
+    </div>
+  ))}
+</div>
+
+
       </div>
     );
   }

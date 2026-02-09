@@ -74,6 +74,30 @@ router.get('/getMAcroGoals', async (req, res) => {
   }
 });
 
+router.post('/updateUserGoals', async (req, res) => {
+  try {
+    const { userId, updatedGoalValues } = req.body;
+    if (!userId || !updatedGoalValues) {
+      return res.status(400).json({ message: "Missing userId or goal data" });
+    }
+    const user = await users.findOne({userId});
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    user.goal = {
+      ...user.goal,
+      ...updatedGoalValues
+    };
+    await user.save();
+    res.status(200).json({
+      message: "User goals updated successfully"});
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
 router.post('/addtodaymetrics',async(req,res)=>{
   try{
     const {userId,water,steps,bpm,sleep} = req.body;

@@ -53,7 +53,7 @@ export function ChartTooltipDefault({dailyMacrosData}) {
     },[dailyMacrosData])
    
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle>Tooltip - Default</CardTitle>
       </CardHeader>
@@ -74,13 +74,13 @@ export function ChartTooltipDefault({dailyMacrosData}) {
             <Bar
               dataKey="steps"
               stackId="a"
-              fill=""
+              fill="#CC561E"
               radius={[0, 0, 4, 4]}
             />
             <Bar
               dataKey="caloriesburned"
               stackId="a"
-              fill=""
+              fill="#F6CE71"
               radius={[4, 4, 0, 0]}
             />
             <ChartTooltip

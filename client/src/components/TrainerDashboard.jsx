@@ -1,237 +1,412 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAuth } from "../../context/AuthContext";
 import axios from 'axios';
 import StatCard from './StatCard'
 import CaloriesBarChart from './Graph';
 import { ChartPieSeparatorNone } from './Piechart';
 import { ChartTooltipDefault } from './ChartTooltip';
+import { BiEdit } from "react-icons/bi";
+import { LuMessageSquareText } from "react-icons/lu";
+import ProgressWithLabel from './ProgressWithLabel';
+import TodaysPlan from './TodaysPlan';
+
 const TrainerDashboard = () => {
-  const [clientRequests,setClientRequests] = useState([]);
-  const [activeClients,setActiveClients] = useState([]);
-  const {user} = useAuth();
-  const [client,setClient] = useState(null);
-  const [clientName,setClientName] = useState('Name');
+  const [clientRequests, setClientRequests] = useState([]);
+  const [activeClients, setActiveClients] = useState([]);
+  const { user } = useAuth();
+  const [client, setClient] = useState(null);
+  const [clientName, setClientName] = useState('Name');
   const [dailyMacrosData, setDailyMacrosData] = useState([]);
-  const [requestsAcceptanceRatio,setRequestsAcceptanceRatio] = useState([])
+  const [requestsAcceptanceRatio, setRequestsAcceptanceRatio] = useState([]);
+  const [goalsPopUp, setGoalsPopUp] = useState(false);
+  const [userPreviousGoals, setUserPreviousGoals] = useState(null);
+  const [sendMessagePopup,setSendMessagePopup] = useState(false);
+  const [newGoals, setNewGoals] = useState({
+  calories: "",
+  protein: "",
+  carbs: "",
+  fats: "",
+  caloriesBurned: "",
+  steps: "",
+  foods: ""
+});
+
   useEffect(() => {
-  const fetchRequests = async () => {
-    if (!user?.uid) return;
-    try {
-      const response = await axios.get(
-        "http://localhost:8080/trainer/gettrainerrequests",
-        {
-          params: { id: user.uid }
-        }
-      );
-
-      console.log(response.data.requests);
-      setClientRequests(response.data.requests);
-      setActiveClients(response.data.activeclients);
-
-      setRequestsAcceptanceRatio([{name:"Rejected Requests",count : response.data.rejectedRequests},
-        {name:"Total Requests",count : response.data.totalReuqests},
-        {name:"Active Requests",count : response.data.totalActiveClients}]);
-    } catch (err) {
-      console.log(
-        "Error fetching client requests to trainer:",
-        err.response?.data || err.message
-      );
-    }
-  };
-  fetchRequests();
-}, [user]);
-
-    const addToClient = async(id,name,goal,plan)=>{
-      try{
-        const response = await axios.post("http://localhost:8080/trainer/addclienttotrainer",
-          {
-            trainerID:user.uid,
-            userId:id,
-            name:name,
-            goal:goal,
-          }
+    const fetchRequests = async () => {
+      if (!user?.uid) return;
+      try {
+        const response = await axios.get(
+          "http://localhost:8080/trainer/gettrainerrequests",
+          { params: { id: user.uid } }
         );
-        setActiveClients(prev => [...prev,response.data.newClient])
-        await removeClientRequest(id);
-      }
-      catch(err){
-        console.log("Error Message : ",err.message);
-      }
-    }
 
-    const removeClientRequest = async(id)=>{
-      try{
-        const response = await axios.post("http://localhost:8080/trainer/removeclientrequests",{trainerID:user.uid,id:id});
-        setClientRequests(prev=>prev.filter(req => req.userId !== id));
+        setClientRequests(response.data.requests);
+        setActiveClients(response.data.activeclients);
+
+        setRequestsAcceptanceRatio([
+          { name: "Rejected Requests", count: response.data.rejectedRequests },
+          { name: "Total Requests", count: response.data.totalReuqests },
+          { name: "Active Requests", count: response.data.totalActiveClients }
+        ]);
+      } catch (err) {
+        console.log(err.message);
       }
-      catch(err){
-        console.log("Error Message : ",err.message)
-      }
-    }
-    const handleChange = async (id,name) => {
+    };
+    fetchRequests();
+  }, [user]);
+
+  const handleChange = async (id, name) => {
     setClient(id);
     setClientName(name);
-    const getResponse = await axios.get(
-      "http://localhost:8080/macros/getDailyMacros",
-      {
-        params: { user: id } 
-      }
-    );
-    setDailyMacrosData(getResponse.data.userDailyMacrosData);
+    try {
+      const res = await axios.get(
+        "http://localhost:8080/macros/getDailyMacros",
+        { params: { user: id } }
+      );
+      setDailyMacrosData(res.data.userDailyMacrosData);
+    } catch (err) {
+      console.log(err.message);
+    }
   };
 
-      const userDailyMacros = dailyMacrosData.map((item) => ({
-      date: item.date,
-      protein: item.protein,
-      carbs: item.carbs,
-      fats: item.fats,
-      calories: item.calories,
-      steps: item.steps,
-      sleep: item.sleep,
-      water: item.water,
-      caloriesburned:item.caloriesburned
-    }));
+  useEffect(() => {
+  if (activeClients.length > 0 && !client) {
+    handleChange(activeClients[0].userId, activeClients[0].name);
+  }
+}, [activeClients]);
+
+
+  const updateGoals = (e) => {
+  const { name, value } = e.target;
+  setNewGoals(prev => ({
+    ...prev,
+    [name]: value
+  }));
+};
+
+  const editUserGoals = async (id) => {
+    setClient(id);
+    setGoalsPopUp(true);
+    try {
+      const res = await axios.get(
+        "http://localhost:8080/macros/getMAcroGoals",
+        { params: { user: id } }
+      );
+      setUserPreviousGoals(res.data.macroGoals.goal);
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+  const updateUserGoals = async()=>{
+    try{
+      const updatedGoals = await axios.post("http://localhost:8080/macros/updateUserGoals",{userId:client,updatedGoalValues:newGoals});
+    }
+    catch(err){
+      console.log(err.message)
+    }
+    setGoalsPopUp(false);
+  }
+
+  const sendMessageToUser = async(id,name)=>{
+    setSendMessagePopup(true);
+    try{
+      const sendMessage = await axios.post("http://localhost:8080/macros/sendMessage",{})
+    }
+    catch(err){
+      console.log(err.message)
+    }
+  }
+  const userDailyMacros = dailyMacrosData.map(item => ({
+    date: item.date,
+    protein: item.protein,
+    carbs: item.carbs,
+    fats: item.fats,
+    calories: item.calories,
+    steps: item.steps,
+    caloriesburned: item.caloriesburned
+  }));
 
   return (
-  <div className="min-h-screen bg-gray-100 flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gray-100 overflow-y-auto lg:overflow-hidden">
 
-    {/* ================= HEADER ================= */}
-    <header className="h-16 bg-white shadow-sm flex items-center justify-between px-4 lg:px-8 shrink-0">
-      <div>
-        <h1 className="text-lg font-semibold">Trainer Dashboard</h1>
-        <p className="text-xs text-gray-500">Strength Coach</p>
-      </div>
+      {/* ================= HEADER ================= */}
+      <header className="h-16 bg-white shadow-sm flex items-center px-4 shrink-0">
+        <div>
+          <h1 className="text-lg font-semibold">Trainer Dashboard</h1>
+          <p className="text-xs text-gray-500">Strength Coach</p>
+        </div>
+      </header>
 
-      <div className="flex items-center gap-3">
-        <button className="w-9 h-9 rounded-full bg-gray-200" />
-        <div className="w-9 h-9 rounded-full bg-gray-300" />
-      </div>
-    </header>
+      {/* ================= BODY ================= */}
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-4 p-4 overflow-y-auto lg:overflow-hidden">
 
-    {/* ================= MAIN ================= */}
-    <main className="flex-1 flex flex-col lg:flex-row gap-6 p-4 lg:p-6 overflow-auto">
+        {/* ================= SIDEBAR ================= */}
+        <aside className="bg-white rounded-xl p-4 flex flex-col gap-2 overflow-y-auto">
+          <StatCard title="Trainer Stats" value="" />
+          <StatCard title="Active Clients" value={activeClients.length} />
+          <StatCard title="Requests" value={clientRequests.length} />
+        </aside>
 
-      {/* ===== SIDEBAR ===== */}
-      <aside className="w-full lg:w-64 bg-white rounded-xl p-4 space-y-4 shrink-0">
-        <StatCard title="Active Clients" value="18" />
-        <StatCard title="Sessions / Week" value="42" />
-        <StatCard title="Avg Compliance" value="87%" />
-        <StatCard title="Calories Burned" value="96k" />
-      </aside>
+        {/* ================= MAIN ================= */}
+        <section className="grid grid-rows-[auto_auto_1fr] gap-4 overflow-y-auto lg:overflow-hidden">
 
-      {/* ===== CONTENT ===== */}
-      <section className="flex-1 flex flex-col gap-6 overflow-hidden">
+          {/* ===== TOP ===== */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
-        {/* ===== TOP SECTION ===== */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-          {/* Trainer Stats */}
-          <div className="lg:col-span-2 bg-white rounded-xl p-4">
-            <h2 className="font-semibold mb-2">Trainer Stats</h2>
-            <div className="h-64 lg:h-80 rounded-lg bg-gray-100 flex items-center justify-center">
-              Trainer Stats Chart
+            <div className="bg-white rounded-xl p-4">
+              <h2 className="font-semibold mb-2">Trainer Stats</h2>
+              <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+                Trainer Stats Chart
+              </div>
             </div>
-          </div>
 
-          {/* Pie Chart */}
-          <div className="bg-white rounded-xl ">
-            <ChartPieSeparatorNone requestsAcceptanceRatio = {requestsAcceptanceRatio}/>
-          </div>
+            <div className="bg-white rounded-xl flex items-center justify-center">
+              <ChartPieSeparatorNone
+                requestsAcceptanceRatio={requestsAcceptanceRatio}
+              />
+            </div>
+            {goalsPopUp && (
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="bg-white rounded-xl p-6 w-[95%] max-w-lg shadow-lg">
+
+      <h2 className="text-xl font-semibold mb-5 text-center">
+        Set Daily Fitness Goals
+      </h2>
+
+      <div className="grid grid-cols-2 gap-4">
+
+        <input
+          type="number"
+          name="calories"
+          value={newGoals.calories}
+          onChange={updateGoals}
+          placeholder="Calories Intake"
+          className="border p-2 rounded"
+        />
+
+        <input
+          type="number"
+          name="caloriesBurned"
+          value={newGoals.caloriesBurned}
+          onChange={updateGoals}
+          placeholder="Calories to Burn"
+          className="border p-2 rounded"
+        />
+
+        <input
+          type="number"
+          name="protein"
+          value={newGoals.protein}
+          onChange={updateGoals}
+          placeholder="Protein (g)"
+          className="border p-2 rounded"
+        />
+
+        <input
+          type="number"
+          name="fats"
+          value={newGoals.fats}
+          onChange={updateGoals}
+          placeholder="Fats (g)"
+          className="border p-2 rounded"
+        />
+
+        <input
+          type="number"
+          name="carbs"
+          value={newGoals.carbs}
+          onChange={updateGoals}
+          placeholder="Carbs (g)"
+          className="border p-2 rounded"
+        />
+
+        <input
+          type="number"
+          name="steps"
+          value={newGoals.steps}
+          onChange={updateGoals}
+          placeholder="Steps"
+          className="border p-2 rounded"
+        />
+      </div>
+
+      <textarea
+        name="foods"
+        value={newGoals.foods}
+        onChange={updateGoals}
+        placeholder="Foods to take (eg: Chicken, Eggs, Oats...)"
+        className="border p-2 rounded w-full mt-4"
+        rows={3}
+      />
+
+      <div className="flex justify-end gap-3 mt-6">
+        <button
+          onClick={() => setGoalsPopUp(false)}
+          className="px-4 py-2 bg-gray-300 rounded"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={updateUserGoals}
+          className="px-4 py-2 bg-blue-600 text-white cursor-pointer rounded"
+        >
+          Save Goals
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
+
+
+{sendMessagePopup && (
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="bg-white rounded-xl p-6 w-[95%] max-w-lg shadow-lg">
+
+      <h2 className="text-xl font-semibold mb-5 text-center">
+        Send Report to Client
+      </h2>
+
+      <textarea
+        name="foods"
+        value={newGoals.foods}
+        onChange={updateGoals}
+        placeholder="Type message here..."
+        className="border p-2 rounded w-full mt-4"
+        rows={3}
+      />
+
+      <div className="flex justify-end gap-3 mt-6">
+        <button
+          onClick={() => setSendMessagePopup(false)}
+          className="px-4 py-2 bg-gray-300 rounded"
+        >
+          Cancel
+        </button>
+
+        <button
+          className="px-4 py-2 bg-blue-600 text-white cursor-pointer rounded"
+        >
+          Send Message
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
+
+            <div className="bg-white rounded-xl p-4 overflow-y-auto max-h-[400px]">
+  
+  {/* ===== ACTIVE CLIENTS ===== */}
+  <h2 className="font-semibold mb-3">Active Clients</h2>
+
+  {activeClients.length === 0 ? (
+    <p className="text-sm text-gray-500 mb-4">No active clients</p>
+  ) : (
+    activeClients.map(item => (
+      <div
+        key={item.userId}
+        className="flex justify-between items-center bg-gray-50 p-3 rounded-lg mb-2"
+      >
+        <div>
+          <p className="font-medium">{item.name}</p>
+          <p className="text-xs text-gray-500">{item.goal}</p>
         </div>
 
-        {/* ===== BOTTOM SECTION ===== */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 overflow-hidden">
+        <div className="flex gap-2 items-center">
+          <LuMessageSquareText className='cursor-pointer' size={18} onClick={()=>sendMessageToUser(item.userId,item.name)}/>
+          <BiEdit
+            size={18}
+            className="cursor-pointer"
+            onClick={() => editUserGoals(item.userId)}
+          />
+          <button
+            onClick={() => handleChange(item.userId, item.name)}
+            className="text-xs bg-black text-white px-3 py-1 rounded"
+          >
+            View
+          </button>
+        </div>
+      </div>
+    ))
+  )}
 
-          {/* Progress */}
-          <div className="lg:col-span-2 bg-white rounded-xl p-4 flex flex-col">
-            <h2 className="font-semibold mb-4">{clientName} - Progress</h2>
+  {/* ===== DIVIDER ===== */}
+  <hr className="my-4" />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
+  {/* ===== REQUESTS ===== */}
+  <h2 className="font-semibold mb-3">Requests</h2>
+
+  {clientRequests.length === 0 ? (
+    <p className="text-sm text-gray-500 text-center">No pending requests</p>
+  ) : (
+    clientRequests.map(item => (
+      <div
+        key={item.userId}
+        className="flex justify-between items-center bg-gray-50 p-3 rounded-lg mb-2"
+      >
+        <div>
+          <p className="font-medium">{item.name}</p>
+          <p className="text-xs text-gray-500">{item.goal}</p>
+        </div>
+
+        <div className="flex gap-2">
+          <button
+            onClick={() =>
+              addToClient(item.userId, item.name, item.goal, item.plan)
+            }
+            className="text-xs bg-green-700 text-white px-2 py-1 rounded"
+          >
+            Accept
+          </button>
+
+          <button
+            onClick={() => removeClientRequest(item.userId)}
+            className="text-xs bg-red-700 text-white px-2 py-1 rounded"
+          >
+            Reject
+          </button>
+        </div>
+      </div>
+    ))
+  )}
+
+</div>
+
+
+          </div>
+          <h4 className='text-center font-semibold'>Client - {clientName} Progress</h4>
+
+          {/* ===== BOTTOM ===== */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 overflow-y-auto">
+
+            <div className="bg-white h-80 lg:h-full rounded-xl p-4 overflow-y-auto">
               <CaloriesBarChart
                 dailyMacrosData={userDailyMacros}
-                // cardHeight="64"
-              />
-              <ChartTooltipDefault
-                dailyMacrosData={userDailyMacros}
-                // cardHeight="52"
+                cardHeight="full"
               />
             </div>
 
-            {/* <button className="mt-4 h-10 bg-gray-200 rounded-2xl">
-              Send Response
-            </button> */}
-          </div>
-
-          {/* Clients */}
-          <div className="flex flex-col gap-6 overflow-hidden">
-
-            {/* Active Clients */}
-            <div className="bg-white rounded-xl p-4 max-h-64 lg:flex-1 overflow-y-auto">
-              <h2 className="font-semibold mb-3">Active Clients</h2>
-              {activeClients.map((item) => (
-                <div
-                  key={item.userId}
-                  className="flex justify-between items-center bg-gray-50 p-3 rounded-lg mb-2"
-                >
-                  <div>
-                    <p className="font-medium">{item.name}</p>
-                    <p className="text-xs text-gray-500">{item.goal}</p>
-                  </div>
-                  <button
-                    onClick={() => handleChange(item.userId, item.name)}
-                    className="text-xs bg-black text-white px-3 py-1 rounded"
-                  >
-                    View
-                  </button>
-                </div>
-              ))}
+            <div className="bg-white rounded-xl p-4 overflow-y-auto h-full">
+              {/* <h2 className="font-semibold mb-2">
+                Daily Steps & Calories Burned
+              </h2> */}
+              <ChartTooltipDefault dailyMacrosData={userDailyMacros} />
             </div>
 
-            {/* Client Requests */}
-            <div className="bg-white rounded-xl p-4 max-h-64 lg:flex-1 overflow-y-auto">
-              <h2 className="font-semibold mb-3">Client Requests</h2>
-
-              {clientRequests.length === 0 ? (
-                <p className="text-sm text-gray-500">No pending requests</p>
-              ) : (
-                clientRequests.map((item) => (
-                  <div
-                    key={item.userId}
-                    className="flex justify-between items-center bg-gray-50 p-3 rounded-lg mb-2"
-                  >
-                    <div>
-                      <p className="font-medium">{item.name}</p>
-                      <p className="text-xs text-gray-500">{item.goal}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() =>
-                          addToClient(item.userId, item.name, item.goal, item.plan)
-                        }
-                        className="text-xs bg-green-700 text-white px-2 py-1 rounded"
-                      >
-                        Accept
-                      </button>
-                      <button
-                        onClick={() => removeClientRequest(item.userId)}
-                        className="text-xs bg-red-700 text-white px-2 py-1 rounded"
-                      >
-                        Reject
-                      </button>
-                    </div>
-                  </div>
-                ))
-              )}
+            <div className= "grid grid-cols-2 gap-2 bg-white rounded-xl p-4 overflow-y-auto">
+              {/* <ProgressWithLabel label = "Carbs" value = "24"/>
+              <ProgressWithLabel label = "protein" value = "90"/>
+              <ProgressWithLabel label = "Calories" value = "87"/>
+              <ProgressWithLabel label = "Fats" value = "50"/> */}
             </div>
-
+            {/* <TodaysPlan/> */}
           </div>
-        </div>
-      </section>
-    </main>
-  </div>
-);
+        </section>
+      </div>
+    </div>
+  );
+};
 
-
-}
-
-export default TrainerDashboard
+export default TrainerDashboard;

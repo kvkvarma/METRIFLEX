@@ -21,6 +21,35 @@ const Dashboard = () => {
   const [targetUserGoals, setTargetUserGoals] = useState({});
   const [trainers, setTrainers] = useState([]);
 
+  const [todayPopUp,setTodayPopup] = useState(false);
+
+  const [cardioMetrics, setCardioMetrics] = useState({
+    water: 0,
+    steps: 0,
+    bpm: 0,
+    sleep: 0
+  })
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setCardioMetrics(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const addTodayMetrics = async (e) => {
+    e.preventDefault()
+    try {
+      await axios.post(
+        "http://localhost:8080/macros/addtodaymetrics",
+        { userId: user.uid, ...cardioMetrics }
+      )
+    } catch (err) {
+      console.log("Error message :", err.message)
+    }
+  }
+
   useEffect(() => {
     if (!user) return;
     const fetchData = async () => {
@@ -107,9 +136,115 @@ const Dashboard = () => {
           </div>
 
           {/* Daily Tasks */}
+
+          {todayPopUp && 
+            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+  <div className="bg-white rounded-2xl p-6 w-[95%] max-w-lg shadow-xl">
+
+    <h2 className="text-xl font-semibold mb-6 text-center">
+      Update Daily Cardio Metrics
+    </h2>
+
+    <form
+      onSubmit={addTodayMetrics}
+      className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+    >
+      {/* STEPS */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Steps
+        </label>
+        <input
+          type="number"
+          name="steps"
+          value={cardioMetrics.steps}
+          onChange={handleChange}
+          placeholder="e.g. 8000"
+          className="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm
+                     focus:outline-none focus:ring-2 focus:ring-black"
+          required
+        />
+      </div>
+
+      {/* BPM */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          BPM Level
+        </label>
+        <input
+          type="number"
+          name="bpm"
+          value={cardioMetrics.bpm}
+          onChange={handleChange}
+          placeholder="e.g. 120"
+          className="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm
+                     focus:outline-none focus:ring-2 focus:ring-black"
+          required
+        />
+      </div>
+
+      {/* WATER */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Water Intake (litres)
+        </label>
+        <input
+          type="number"
+          name="water"
+          value={cardioMetrics.water}
+          onChange={handleChange}
+          placeholder="e.g. 3"
+          className="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm
+                     focus:outline-none focus:ring-2 focus:ring-black"
+          required
+        />
+      </div>
+
+      {/* SLEEP */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Sleep (hours)
+        </label>
+        <input
+          type="number"
+          name="sleep"
+          value={cardioMetrics.sleep}
+          onChange={handleChange}
+          placeholder="e.g. 7"
+          className="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm
+                     focus:outline-none focus:ring-2 focus:ring-black"
+          required
+        />
+      </div>
+
+      {/* ACTION BUTTONS */}
+      <div className="col-span-full flex justify-end gap-3 mt-4">
+        <button
+          type="button"
+          onClick={() => setTodayPopup(false)}
+          className="px-5 py-2 rounded-xl bg-gray-200 text-sm font-medium hover:bg-gray-300 transition"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={()=>setTodayPopup(false)}
+          type="submit"
+          className="px-5 py-2 rounded-xl bg-black text-white text-sm font-medium
+                     hover:bg-gray-800 transition"
+        >
+          Save Metrics
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+          }
           <section className="grid grid-cols-2 lg:grid-cols-6 gap-3 flex-shrink-0">
             <div className="col-span-2 bg-white h-20 rounded-xl p-3 flex items-center">
-              <TodaysPlan userGoals={userGoals} todayEntry={todayEntry} />
+              <TodaysPlan userGoals={userGoals} todayEntry={todayEntry} setTodayPopup = {setTodayPopup}/>
             </div>
 
             <div className="bg-white h-20 rounded-xl p-3 flex flex-col justify-between">

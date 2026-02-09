@@ -55,7 +55,7 @@ const SmallProgressCircle = ({ percentage, achieved, total }) => {
   );
 };
 
-const TodaysPlan = ({ userGoals, todayEntry }) => {
+const TodaysPlan = ({ userGoals, todayEntry,setTodayPopup }) => {
   const navigate = useNavigate();
 
   const goals = 4;
@@ -106,7 +106,7 @@ const TodaysPlan = ({ userGoals, todayEntry }) => {
 
       {/* Right side - Action Button */}
       <button
-        onClick={() => navigate("/todaymetrics")}
+        onClick={() => setTodayPopup(true)}
         className="flex items-center gap-2 bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-800 hover:to-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95 flex-shrink-0"
       >
         <Plus className="w-4 h-4" />

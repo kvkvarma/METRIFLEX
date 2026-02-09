@@ -8,7 +8,6 @@ import Macros from './components/Macros';
 import Sidebar from './components/Sidebar';
 import TrainerDashboard from './components/TrainerDashboard';
 import Trainers from './components/Trainers';
-import TodayMetrics from './components/TodayMetrics';
 function App() {
   return (
      
@@ -20,7 +19,6 @@ function App() {
       <Route path="/trainers" element={<Trainers />} />
       <Route path="/workoutsplits" element={<WorkoutSplit />} />
       <Route path="/macros" element={<Macros />} />
-      <Route path="/todaymetrics" element={<TodayMetrics />} />
     </Route>
 </Routes>
 

@@ -33,7 +33,7 @@ const chartConfig = {
     label: "Visitors",
   },
   steps: {
-    label: "Water",
+    label: "Steps",
     color: "var(--chart-1)",
   },
   caloriesburned: {
