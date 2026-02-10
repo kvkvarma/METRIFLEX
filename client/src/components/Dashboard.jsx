@@ -48,6 +48,7 @@ const Dashboard = () => {
     } catch (err) {
       console.log("Error message :", err.message)
     }
+    setTodayPopup(false);
   }
 
   useEffect(() => {
@@ -91,7 +92,7 @@ const Dashboard = () => {
     water: item.water,
     caloriesburned:item.caloriesburned
   }));
-
+ 
   const userGoals = {
     waterGoal: targetUserGoals?.water ?? 0,
     sleepGoal: targetUserGoals?.sleep ?? 0,
@@ -111,7 +112,7 @@ const Dashboard = () => {
     <main className="h-screen overflow-hiddden p-4 lg:p-4 flex flex-col">
       <div className="max-w-[1600px] mx-auto w-full h-full flex flex-col gap-3 overflow-y-auto lg:overflow-hidden scrollbar-hide">
         {/* Header */}
-        <div className="flex justify-between items-center bg-gray-200 p-3 rounded-xl flex-shrink-0">
+        <div className="flex justify-between items-center bg-gradient-to-b from-gray-700 to-gray-900 p-4 flex-shrink-0">
             <div className="flex items-center gap-3">
               <button
                 className="lg:hidden p-2 bg-white rounded"
@@ -121,18 +122,18 @@ const Dashboard = () => {
               </button>
 
               <div>
-                <h1 className="text-base lg:text-lg font-bold">
+                <h1 className="text-base lg:text-lg font-bold text-white">
                   Welcome Back, Alex! Let's crush today
                 </h1>
-                <p className="hidden lg:block text-xs text-gray-600">
+                <p className="hidden lg:block text-xs text-gray-200">
                   Here's what's happening at your gym today
                 </p>
               </div>
             </div>
 
-            <div className="flex gap-2">
+            {/* <div className="flex gap-2">
               <div className="w-8 h-8 bg-white rounded-full" />
-            </div>
+            </div> */}
           </div>
 
           {/* Daily Tasks */}
@@ -228,7 +229,6 @@ const Dashboard = () => {
         </button>
 
         <button
-          onClick={()=>setTodayPopup(false)}
           type="submit"
           className="px-5 py-2 rounded-xl bg-black text-white text-sm font-medium
                      hover:bg-gray-800 transition"

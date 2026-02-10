@@ -56,7 +56,7 @@ const SmallProgressCircle = ({ percentage, achieved, total }) => {
 };
 
 const TodaysPlan = ({ userGoals, todayEntry,setTodayPopup }) => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const goals = 4;
   let achievedGoals = 0;

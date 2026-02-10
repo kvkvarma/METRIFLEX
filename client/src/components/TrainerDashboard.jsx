@@ -7,10 +7,13 @@ import { ChartPieSeparatorNone } from './Piechart';
 import { ChartTooltipDefault } from './ChartTooltip';
 import { BiEdit } from "react-icons/bi";
 import { LuMessageSquareText } from "react-icons/lu";
-import ProgressWithLabel from './ProgressWithLabel';
-import TodaysPlan from './TodaysPlan';
+import MacroProgress from './MacroProgress';
+import ChartRadialLabel from './ChartLabel';
+import { useMemo } from 'react';
+import { CosIcon } from '@hugeicons/core-free-icons/index';
 
 const TrainerDashboard = () => {
+
   const [clientRequests, setClientRequests] = useState([]);
   const [activeClients, setActiveClients] = useState([]);
   const { user } = useAuth();
@@ -21,15 +24,17 @@ const TrainerDashboard = () => {
   const [goalsPopUp, setGoalsPopUp] = useState(false);
   const [userPreviousGoals, setUserPreviousGoals] = useState(null);
   const [sendMessagePopup,setSendMessagePopup] = useState(false);
+  const [targetUserGoals, setTargetUserGoals] = useState({});
+
   const [newGoals, setNewGoals] = useState({
-  calories: "",
-  protein: "",
-  carbs: "",
-  fats: "",
-  caloriesBurned: "",
-  steps: "",
-  foods: ""
-});
+    calories: "",
+    protein: "",
+    carbs: "",
+    fats: "",
+    caloriesBurned: "",
+    steps: "",
+    foods: ""
+  });
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -39,7 +44,6 @@ const TrainerDashboard = () => {
           "http://localhost:8080/trainer/gettrainerrequests",
           { params: { id: user.uid } }
         );
-
         setClientRequests(response.data.requests);
         setActiveClients(response.data.activeclients);
 
@@ -55,6 +59,7 @@ const TrainerDashboard = () => {
     fetchRequests();
   }, [user]);
 
+
   const handleChange = async (id, name) => {
     setClient(id);
     setClientName(name);
@@ -64,16 +69,51 @@ const TrainerDashboard = () => {
         { params: { user: id } }
       );
       setDailyMacrosData(res.data.userDailyMacrosData);
+      const userGoals = await axios.get("http://localhost:8080/macros/getMAcroGoals",{
+        params : {user:id}
+      })
+      setTargetUserGoals(userGoals.data.macroGoals.goal);
     } catch (err) {
       console.log(err.message);
     }
   };
+  
+  const userDailyMacros = dailyMacrosData.map((item) => ({
+    date: item.date,
+    protein: item.protein,
+    carbs: item.carbs,
+    fats: item.fats,
+    calories: item.calories,
+    steps: item.steps,
+    sleep: item.sleep,
+    water: item.water,
+    caloriesburned: item.caloriesburned
+  }));
 
+  console.log("User daily macxros : ",userDailyMacros);
+
+  const userGoals = {
+    waterGoal: targetUserGoals?.water ?? 0,
+    sleepGoal: targetUserGoals?.sleep ?? 0,
+    stepsGoal: targetUserGoals?.steps ?? 0,
+    calorieGoal: targetUserGoals?.calories ?? 0,
+    proteinGoal: targetUserGoals?.protein ?? 0,
+    carbsGoal: targetUserGoals?.carbs ?? 0,
+    fatsGoal: targetUserGoals?.fats ?? 0,
+  };
+const todayEntry = useMemo(() => {
+  if (!userDailyMacros.length) return null;
+  return [...userDailyMacros]
+    .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+}, [userDailyMacros]);
+
+
+console.log("todayEntry",todayEntry)
   useEffect(() => {
   if (activeClients.length > 0 && !client) {
     handleChange(activeClients[0].userId, activeClients[0].name);
   }
-}, [activeClients]);
+  },[activeClients,client]);
 
 
   const updateGoals = (e) => {
@@ -116,15 +156,6 @@ const TrainerDashboard = () => {
       console.log(err.message)
     }
   }
-  const userDailyMacros = dailyMacrosData.map(item => ({
-    date: item.date,
-    protein: item.protein,
-    carbs: item.carbs,
-    fats: item.fats,
-    calories: item.calories,
-    steps: item.steps,
-    caloriesburned: item.caloriesburned
-  }));
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100 overflow-y-auto lg:overflow-hidden">
@@ -291,7 +322,6 @@ const TrainerDashboard = () => {
           Send Message
         </button>
       </div>
-
     </div>
   </div>
 )}
@@ -389,19 +419,12 @@ const TrainerDashboard = () => {
             </div>
 
             <div className="bg-white rounded-xl p-4 overflow-y-auto h-full">
-              {/* <h2 className="font-semibold mb-2">
-                Daily Steps & Calories Burned
-              </h2> */}
               <ChartTooltipDefault dailyMacrosData={userDailyMacros} />
             </div>
 
-            <div className= "grid grid-cols-2 gap-2 bg-white rounded-xl p-4 overflow-y-auto">
-              {/* <ProgressWithLabel label = "Carbs" value = "24"/>
-              <ProgressWithLabel label = "protein" value = "90"/>
-              <ProgressWithLabel label = "Calories" value = "87"/>
-              <ProgressWithLabel label = "Fats" value = "50"/> */}
+            <div className= " bg-white rounded-xl p-5 overflow-auto">
+              <ChartRadialLabel todayEntry = {todayEntry} userGoals = {userGoals} className = "w-full h-full"/>
             </div>
-            {/* <TodaysPlan/> */}
           </div>
         </section>
       </div>
