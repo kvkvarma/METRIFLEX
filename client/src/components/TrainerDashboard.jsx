@@ -11,7 +11,7 @@ import MacroProgress from './MacroProgress';
 import ChartRadialLabel from './ChartLabel';
 import { useMemo } from 'react';
 import { CosIcon } from '@hugeicons/core-free-icons/index';
-
+import TooltipDemo from './TooltipDemo';
 const TrainerDashboard = () => {
 
   const [clientRequests, setClientRequests] = useState([]);
@@ -24,6 +24,7 @@ const TrainerDashboard = () => {
   const [goalsPopUp, setGoalsPopUp] = useState(false);
   const [userPreviousGoals, setUserPreviousGoals] = useState(null);
   const [sendMessagePopup,setSendMessagePopup] = useState(false);
+  const [workoutSplitPopup,setWorkoutSplitPopup] = useState(false);
   const [targetUserGoals, setTargetUserGoals] = useState({});
 
   const [newGoals, setNewGoals] = useState({
@@ -35,6 +36,16 @@ const TrainerDashboard = () => {
     steps: "",
     foods: ""
   });
+
+  const [splitGoals, setSplitGoals] = useState({
+  Monday: "",
+  Tuesday: "",
+  Wednesday: "",
+  Thursday: "",
+  Friday: "",
+  Saturday: "",
+});
+
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -107,6 +118,14 @@ const todayEntry = useMemo(() => {
     .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
 }, [userDailyMacros]);
 
+const updateSplit = (e) => {
+  const { name, value } = e.target;
+  setSplitGoals((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+};
+
 
 console.log("todayEntry",todayEntry)
   useEffect(() => {
@@ -157,6 +176,16 @@ console.log("todayEntry",todayEntry)
     }
   }
 
+  const editWorkoutSplit = async(id,name)=>{
+    setWorkoutSplitPopup(true);
+    try{
+
+    }
+    catch(err){
+      console.log(err.message)
+    }
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-100 overflow-y-auto lg:overflow-hidden">
 
@@ -196,7 +225,94 @@ console.log("todayEntry",todayEntry)
                 requestsAcceptanceRatio={requestsAcceptanceRatio}
               />
             </div>
-            {goalsPopUp && (
+{workoutSplitPopup && (
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="bg-white rounded-xl p-6 w-[95%] max-w-lg shadow-lg">
+
+      <h2 className="text-xl font-semibold mb-5 text-center">
+        Set Weekly Workout Split
+      </h2>
+
+      <div className="grid grid-cols-2 gap-4">
+
+        <input
+          type="text"
+          name="Monday"
+          value={splitGoals.Monday}
+          onChange={updateSplit}
+          placeholder="Monday"
+          className="border p-2 rounded"
+        />
+
+        <input
+          type="text"
+          name="Tuesday"
+          value={splitGoals.Tuesday}
+          onChange={updateSplit}
+          placeholder="Tuesday"
+          className="border p-2 rounded"
+        />
+
+        <input
+          type="text"
+          name="Wednesday"
+          value={splitGoals.Wednesday}
+          onChange={updateSplit}
+          placeholder="Wednesday"
+          className="border p-2 rounded"
+        />
+
+        <input
+          type="text"
+          name="Thursday"
+          value={splitGoals.Thursday}
+          onChange={updateSplit}
+          placeholder="Thursday"
+          className="border p-2 rounded"
+        />
+
+        <input
+          type="text"
+          name="Friday"
+          value={splitGoals.Friday}
+          onChange={updateSplit}
+          placeholder="Friday"
+          className="border p-2 rounded"
+        />
+
+        <input
+          type="text"
+          name="Saturday"
+          value={splitGoals.Saturday}
+          onChange={updateSplit}
+          placeholder="Saturday"
+          className="border p-2 rounded"
+        />
+
+      </div>
+
+      <div className="flex justify-end gap-3 mt-6">
+        <button
+          onClick={() => setSplitPopUp(false)}
+          className="px-4 py-2 bg-gray-300 rounded"
+        >
+          Cancel
+        </button>
+
+        <button
+          // onClick={saveWorkoutSplit}
+          className="px-4 py-2 bg-blue-600 text-white cursor-pointer rounded"
+        >
+          Save Split
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
+
+            
+  {goalsPopUp && (
   <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
     <div className="bg-white rounded-xl p-6 w-[95%] max-w-lg shadow-lg">
 
@@ -346,11 +462,19 @@ console.log("todayEntry",todayEntry)
 
         <div className="flex gap-2 items-center">
           <LuMessageSquareText className='cursor-pointer' size={18} onClick={()=>sendMessageToUser(item.userId,item.name)}/>
+          
           <BiEdit
             size={18}
             className="cursor-pointer"
             onClick={() => editUserGoals(item.userId)}
           />
+
+          <BiEdit
+            size={18}
+            className="cursor-pointer"
+            onClick={() => editWorkoutSplit(item.userId)}
+          />
+
           <button
             onClick={() => handleChange(item.userId, item.name)}
             className="text-xs bg-black text-white px-3 py-1 rounded"

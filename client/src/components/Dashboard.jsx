@@ -6,19 +6,20 @@ import { useOutletContext } from "react-router-dom";
 import ProgressWithLabel from "./ProgressWithLabel";
 import Graph from "./Graph";
 import axios from "axios";
-
+// import TrackingCalendar from "./TrackingCalendar"
 import { useAuth } from "../../context/AuthContext";
 import CaloriesCard from "./CaloriesCard";
 import MacrosCard from "./MacroCard";
 import TodaysPlan from "./TodaysPlan";
 import ChartAreaInteractive from "./Chart";
+import { CalendarDemo } from "./TrackingCalendar";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const { setOpen } = useOutletContext();
-
   const [dailyMacrosData, setDailyMacrosData] = useState([]);
   const [targetUserGoals, setTargetUserGoals] = useState({});
+  const [workoutSplit,setWorkoutSplit] = useState({});
   const [trainers, setTrainers] = useState([]);
 
   const [todayPopUp,setTodayPopup] = useState(false);
@@ -67,6 +68,7 @@ const Dashboard = () => {
         
         setDailyMacrosData(dailyMacrosResponse.data.userDailyMacrosData);
         setTargetUserGoals(userGoalsResponse.data.macroGoals.goal);
+        setWorkoutSplit(userGoalsResponse.data.macroGoals.workoutSplit);
 
         const trainersResponse = await axios.get(
           "http://localhost:8080/trainer/getTrainers"
@@ -107,6 +109,14 @@ const Dashboard = () => {
     const today = new Date().toISOString().split("T")[0];
     return newMacros.find((item) => item.date.startsWith(today));
   }, [newMacros]);
+
+  const trackingData = {
+  "2026-02-01": { calories: 2200, goal: 2000 },
+  "2026-02-02": { calories: 1500, goal: 2000 },
+  "2026-02-03": { calories: 800, goal: 2000 },
+  "2026-02-05": { calories: 2000, goal: 2000 },
+};
+
 
   return (
     <main className="h-screen overflow-hiddden p-4 lg:p-4 flex flex-col">
@@ -315,24 +325,58 @@ const Dashboard = () => {
             </div>
 
             {/* Workout Statistics */}
-            <div className="bg-white rounded-2xl p-3 shadow-sm flex flex-col lg:min-h-0">
-              <div className="flex justify-between items-center mb-3 flex-shrink-0">
-                <h2 className="font-semibold text-gray-800 text-sm">Workout Statistics</h2>
-                <span className="text-xs text-gray-400">Weekly</span>
+            <div className="bg-white rounded-2xl p-4 shadow-sm flex flex-col lg:min-h-0">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="font-semibold text-gray-800 text-sm">Bro Split Plan</h2>
+                <span className="text-xs text-gray-400">6 Day Routine</span>
               </div>
 
-              <div className="flex-1 flex items-center justify-center min-h-[120px]">
-                <div className="w-32 h-32 rounded-full border-[10px] border-lime-400 flex flex-col items-center justify-center">
-                  <span className="text-lg font-bold">35 min</span>
-                  <span className="text-xs text-gray-500">350 calories</span>
+              <div className="grid grid-cols-1 gap-3 overflow-auto">
+                <div className="rounded-xl bg-gray-100 p-3 border border-gray-200">
+                  <h3 className="text-sm font-semibold text-gray-800">Monday - {workoutSplit.Monday}</h3>
+                  <p className="text-xs text-gray-600 mt-1">
+                    Bench Press • Incline DB Press • Chest Fly • Pushups
+                  </p>
                 </div>
-              </div>
 
-              <div className="space-y-2 flex-shrink-0">
-                <ProgressWithLabel />
-                <ProgressWithLabel />
+                <div className="rounded-xl bg-gray-100 p-3 border border-gray-200">
+                  <h3 className="text-sm font-semibold text-gray-800">Tuesday - {workoutSplit.Tuesday}</h3>
+                  <p className="text-xs text-gray-600 mt-1">
+                    Deadlifts • Pullups • Lat Pulldown • Barbell Rows
+                  </p>
+                </div>
+
+                <div className="rounded-xl bg-gray-100 p-3 border border-gray-200">
+                  <h3 className="text-sm font-semibold text-gray-800">Wednesday - {workoutSplit.Wednesday}</h3>
+                  <p className="text-xs text-gray-600 mt-1">
+                    Overhead Press • Lateral Raises • Rear Delt Fly
+                  </p>
+                </div>
+
+                <div className="rounded-xl bg-gray-100 p-3 border border-gray-200">
+                  <h3 className="text-sm font-semibold text-gray-800">Thursday - {workoutSplit.Thursday}</h3>
+                  <p className="text-xs text-gray-600 mt-1">
+                    Barbell Curl • Tricep Dips • Skull Crushers
+                  </p>
+                </div>
+
+                <div className="rounded-xl bg-gray-100 p-3 border border-gray-200">
+                  <h3 className="text-sm font-semibold text-gray-800">Friday - {workoutSplit.Friday}</h3>
+                  <p className="text-xs text-gray-600 mt-1">
+                    Squats • Leg Press • Lunges • Hamstring Curls
+                  </p>
+                </div>
+
+                <div className="rounded-xl bg-gray-100 p-3 border border-gray-200">
+                  <h3 className="text-sm font-semibold text-gray-800">Saturday - {workoutSplit.Saturday}</h3>
+                  <p className="text-xs text-gray-600 mt-1">
+                    Planks • Crunches • Mountain Climbers • HIIT
+                  </p>
+                </div>
+
               </div>
             </div>
+
             <div className="bg-white rounded-2xl p-3 shadow-sm flex flex-col lg:min-h-0">
               <div className="flex justify-between items-center mb-3 flex-shrink-0">
                 <h2 className="font-semibold text-gray-800 text-sm">Popular trainer</h2>
@@ -341,7 +385,7 @@ const Dashboard = () => {
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3 lg:flex-1 lg:min-h-0 lg:overflow-auto">
+              <div className="grid grid-cols-1  sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3 lg:flex-1 lg:min-h-0 lg:overflow-auto">
                 {/* Trainer Card 1 */}
                 <div className="h-full min-h-[180px] rounded-xl bg-gradient-to-b from-red-800 to-red-600 text-white p-3 flex flex-col">
                   <div className="flex-1 min-h-0">

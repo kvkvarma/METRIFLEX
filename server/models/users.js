@@ -10,6 +10,15 @@ const goalSchema = new mongoose.Schema({
     steps : {type: Number, required:false,default:10000},
     sleep : {type: Number, required:false,default:8}
 });
+const workoutSplitSchema = new mongoose.Schema({
+    Monday : {type:String,default:"Chest"},
+    Tuesday : {type:String,default:"Back"},
+    Wednesday : {type:String,default:"Shoulders"},
+    Thursday : {type:String,default:"Arms"},
+    Friday : {type:String,default:"Legs"},
+    Saturday : {type:String,default:"Abs & Cardio"},
+    Sunday : {type:String,default:"Rest"},
+})
 
 const userSchema =  new mongoose.Schema({
 
@@ -24,6 +33,11 @@ const userSchema =  new mongoose.Schema({
     goal: {
         type: goalSchema,
         default: () => ({}) 
+    },
+    
+    workoutSplit:{
+        type : workoutSplitSchema,
+        default : ()=>({})
     },
 
     trainerId:{type: String, required:false,default:null},
