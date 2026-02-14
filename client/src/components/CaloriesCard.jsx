@@ -1,45 +1,57 @@
-import { FaFire } from "react-icons/fa";
-import React from "react";
-import { useState } from "react";
+import { FaFire } from 'react-icons/fa';
+import React from 'react';
+import { useState } from 'react';
 
-const CaloriesCard = ({ dailyMacrosData, todayEntry , userGoals }) => {
+const CaloriesCard = ({ dailyMacrosData, todayEntry, userGoals }) => {
+  let progress =
+    todayEntry && userGoals.calorieGoal
+      ? (todayEntry.calories / userGoals.calorieGoal) * 100
+      : 0;
 
-  let progress = todayEntry && userGoals.calorieGoal ? (todayEntry.calories/userGoals.calorieGoal)*100 :0;
+  const [progressLength, setProgressLength] = useState('1');
 
-  const [progressLength, setProgressLength] = useState("1");
-
-  if(progressLength === "7"){
-    if(dailyMacrosData){
+  if (progressLength === '7') {
+    if (dailyMacrosData) {
       const last7Days = dailyMacrosData.slice(-7);
       const length = last7Days.length;
-      const totalCalories = last7Days.reduce((sum,entry)=>sum+entry.calories,0);
+      const totalCalories = last7Days.reduce(
+        (sum, entry) => sum + entry.calories,
+        0
+      );
       const reqCalories = userGoals.calorieGoal * length;
-      console.log("Total Calories for 7 Days : ",totalCalories);
-      console.log("Required Calories for 7 Days : ",reqCalories);
-      progress = (totalCalories/reqCalories)*100;
+      console.log('Total Calories for 7 Days : ', totalCalories);
+      console.log('Required Calories for 7 Days : ', reqCalories);
+      progress = (totalCalories / reqCalories) * 100;
     }
-  }
-  else if(progressLength === "30"){
-    if(dailyMacrosData){
+  } else if (progressLength === '30') {
+    if (dailyMacrosData) {
       const last30Days = dailyMacrosData.slice(-30);
       const length = last30Days.length;
-      const totalCalories = last30Days.reduce((sum,entry)=>sum+entry.calories,0);
+      const totalCalories = last30Days.reduce(
+        (sum, entry) => sum + entry.calories,
+        0
+      );
       const reqCalories = userGoals.calorieGoal * length;
-      progress = (totalCalories/reqCalories)*100;
+      progress = (totalCalories / reqCalories) * 100;
     }
   }
 
   return (
-    
     <div className="bg-white rounded-2xl p-2 shadow-sm flex flex-col gap-1">
       {/* Header */}
 
-      <div className = "flex items-center justify-between">
-        <h3 className = "text-lg font-semibold">Calories</h3>
-        <select value = {progressLength} name = "progresslength" id = "progresslength" className = "text-sm" onChange={(e)=>setProgressLength(e.target.value)}>
-          <option value = "1" > Today </option>
-          <option value = "7" > Week </option>
-          <option value = "30" > Month </option>
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Calories</h3>
+        <select
+          value={progressLength}
+          name="progresslength"
+          id="progresslength"
+          className="text-sm"
+          onChange={(e) => setProgressLength(e.target.value)}
+        >
+          <option value="1"> Today </option>
+          <option value="7"> Week </option>
+          <option value="30"> Month </option>
         </select>
       </div>
 
@@ -73,8 +85,8 @@ const CaloriesCard = ({ dailyMacrosData, todayEntry , userGoals }) => {
             strokeLinecap="round"
             strokeDasharray={`${(progress / 100) * 282.6} 282.6`}
             style={{
-            transition: "stroke-dasharray 0.6s ease",
-             }}
+              transition: 'stroke-dasharray 0.6s ease',
+            }}
           />
         </svg>
 
@@ -87,10 +99,8 @@ const CaloriesCard = ({ dailyMacrosData, todayEntry , userGoals }) => {
       {/* Percentage */}
       <div className="text-center mt-1">
         <p className="text-2xl font-semibold">{progress.toFixed(1)}%</p>
-        <p className="text-sm text-gray-400 mb-5">Based on workout</p>
+        <p className="text-sm text-gray-400 mb-5">Based on Diet</p>
       </div>
-    
-
     </div>
   );
 };

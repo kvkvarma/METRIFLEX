@@ -1,3 +1,5 @@
 {
-    "coderabbit.selfHostedUrl": ""
+  "coderabbit.selfHostedUrl": "",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true
 }
