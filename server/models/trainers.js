@@ -25,6 +25,10 @@ const trainerSchema = new Schema(
     description: { type: String },
     status: { type: String, default: "active" },
 
+    age: { type: Number },
+    gender: { type: String },
+    contact: { type: String },
+
     totalrequests: { type: Number, default: 0 },
     rejectedrequests: { type: Number, default: 0 },
     totalactiveclients: { type: Number, default: 0 },

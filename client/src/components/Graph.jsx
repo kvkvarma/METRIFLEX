@@ -1,10 +1,5 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { useState, useMemo } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, useMemo } from 'react';
 import {
   BarChart,
   Bar,
@@ -12,33 +7,33 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-} from "recharts";
+} from 'recharts';
 
 /**
  * Tailwind-safe height map
  */
 const heightMap = {
-  full: "h-full",
-  54: "h-54",
-  64: "h-64",
-  72: "h-72",
-  80: "h-80",
+  full: 'h-full',
+  54: 'h-54',
+  64: 'h-64',
+  72: 'h-72',
+  80: 'h-80',
 };
 
 export default function CaloriesBarChart({
   dailyMacrosData = [],
-  cardHeight = "full",
+  cardHeight = 'full',
 }) {
-  const [macro, setMacro] = useState("protein");
+  const [macro, setMacro] = useState('protein');
 
   /**
    * Transform API data → chart data
    */
   const chartData = useMemo(() => {
     return dailyMacrosData.map((item) => ({
-      day: new Date(item.date).toLocaleDateString("en-US", {
-        day: "2-digit",
-        month: "short",
+      day: new Date(item.date).toLocaleDateString('en-US', {
+        day: '2-digit',
+        month: 'short',
       }),
       protein: item.protein ?? 0,
       carbs: item.carbs ?? 0,
@@ -50,19 +45,13 @@ export default function CaloriesBarChart({
    * Dynamic bar color
    */
   const barColor =
-    macro === "protein"
-      ? "#22c55e"
-      : macro === "carbs"
-      ? "#f59e0b"
-      : "#ef4444";
+    macro === 'protein' ? '#22c55e' : macro === 'carbs' ? '#f59e0b' : '#ef4444';
 
   return (
     <Card className={`${heightMap[cardHeight]} overflow-hidden flex flex-col`}>
       {/* ================= HEADER ================= */}
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-semibold">
-          Macros Intake
-        </CardTitle>
+        <CardTitle className="text-sm font-semibold">Macros Intake</CardTitle>
 
         <select
           value={macro}

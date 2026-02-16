@@ -5,7 +5,7 @@ const User = require("../models/users");
 
 router.get("/getTrainers", async (req, res) => {
   try {
-    const trainersList = await Trainers.find({ status: "active" });
+    const trainersList = await Trainers.find({ status: "Available" });
     return res.status(200).json({ trainers: trainersList });
   } catch (err) {
     console.error("Error fetching Trainers: ", err.message);

@@ -67,6 +67,12 @@ const Dashboard = () => {
           { params: { user: user.uid } }
         );
 
+        const res = await axios.get(
+          'http://localhost:8080/trainer/getTrainers'
+        );
+
+        setTrainers(res.data.trainers);
+
         setDailyMacrosData(dailyMacrosResponse.data.userDailyMacrosData);
         setTargetUserGoals(userGoalsResponse.data.macroGoals.goal);
         setWorkoutSplit(userGoalsResponse.data.macroGoals.workoutSplit);
@@ -404,38 +410,56 @@ const Dashboard = () => {
               </button>
             </div>
 
-            <div className="grid grid-cols-1  sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3 lg:flex-1 lg:min-h-0 lg:overflow-auto">
-              {/* Trainer Card 1 */}
-              <div className="h-full min-h-[180px] rounded-xl bg-gradient-to-b from-red-800 to-red-600 text-white p-3 flex flex-col">
-                <div className="flex-1 min-h-0">
-                  <h3 className="font-normal text-base mb-2">Adam Smith</h3>
-                  <div className="overflow-y-auto max-h-[100px] pr-1 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
-                    <p className="text-xs opacity-80 leading-relaxed">
-                      MMA Expert With 10 Years of Experience in Training
-                      Professional Fighters.
-                    </p>
-                  </div>
-                </div>
-                <button className="text-xs bg-white/20 rounded-lg py-1.5 mt-2 hover:bg-white/30 transition-colors flex-shrink-0">
-                  View profile
-                </button>
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6 lg:flex-1 lg:min-h-0 p-1">
+              {trainers.map((item) => (
+                <div
+                  key={item.trainerId}
+                  className="bg-white rounded-2xl shadow-md  p-6 flex flex-col justify-between border border-gray-100"
+                >
+                  {/* Top Section */}
+                  <div>
+                    <div className="flex items-center justify-between">
+                      {/* Initial Circle */}
+                      <div className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-900 text-white font-semibold text-lg">
+                        {item.name?.charAt(0)}
+                      </div>
 
-              {/* Trainer Card 2 */}
-              <div className="h-full min-h-45 rounded-xl bg-linear-to-b from-green-800 to-green-600 text-white p-3 flex flex-col">
-                <div className="flex-1 min-h-0">
-                  <h3 className="font-normal text-base mb-2">Sarah Johnson</h3>
-                  <div className="overflow-y-auto max-h-[100px] pr-1 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
-                    <p className="text-xs opacity-80 leading-relaxed">
-                      Yoga and Flexibility Expert. Certified instructor with
-                      holistic approach.
+                      {/* Experience Badge */}
+                      <span className="text-xs px-3 py-1 rounded-full bg-red-100 text-red-600 font-medium">
+                        {item.experience} yrs exp
+                      </span>
+                    </div>
+
+                    {/* Name */}
+                    <h3 className="mt-4 text-lg font-semibold text-gray-800">
+                      {item.name}
+                    </h3>
+
+                    {/* Age & Gender */}
+                    <div className="mt-2 flex gap-4 text-sm text-gray-500">
+                      <p>{item.age} years</p>
+                      <p>{item.gender}</p>
+                    </div>
+
+                    {/* Speciality */}
+                    <div className="mt-3">
+                      <span className="inline-block px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-700 font-medium">
+                        {item.speciality}
+                      </span>
+                    </div>
+
+                    {/* Description */}
+                    <p className="mt-3 text-sm text-gray-500 leading-relaxed line-clamp-3 overflow-auto">
+                      {item.description}
                     </p>
                   </div>
+
+                  {/* Button */}
+                  <button className="mt-6 w-full bg-red-600 text-white py-2.5 rounded-xl hover:bg-red-700 transition-all font-medium text-sm">
+                    View Profile
+                  </button>
                 </div>
-                <button className="text-xs bg-white/20 rounded-lg py-1.5 mt-2 hover:bg-white/30 transition-colors flex-shrink-0">
-                  View profile
-                </button>
-              </div>
+              ))}
             </div>
           </div>
         </section>
