@@ -152,6 +152,31 @@ const TrainerDashboard = () => {
     }));
   };
 
+  const addToClient = async (id, name, goal) => {
+    try {
+      const response = await axios.post(
+        'http://localhost:8080/trainer/addclienttotrainer',
+        { trainerID: user.uid, userId: id, name, goal }
+      );
+      setActiveClients((prev) => [...prev, { userId: id, name, goal }]);
+      removeClientRequest(id);
+      setClientRequests((prev) => prev.filter((item) => item.userId !== id));
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
+  const removeClientRequest = async (id) => {
+    try {
+      const response = await axios.post(
+        'http://localhost:8080/trainer/removeclientrequest',
+        { trainerID: user.uid, id: id }
+      );
+      setClientRequests((prev) => prev.filter((item) => item.userId !== id));
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
   useEffect(() => {
     if (activeClients.length > 0 && !client) {
       handleChange(activeClients[0].userId, activeClients[0].name);
@@ -697,12 +722,7 @@ const TrainerDashboard = () => {
                       <div className="flex gap-2">
                         <button
                           onClick={() =>
-                            addToClient(
-                              item.userId,
-                              item.name,
-                              item.goal,
-                              item.plan
-                            )
+                            addToClient(item.userId, item.name, item.goal)
                           }
                           className="text-xs bg-green-700 text-white px-2 py-1 rounded"
                         >
@@ -728,10 +748,7 @@ const TrainerDashboard = () => {
             {/* ===== BOTTOM ===== */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 overflow-y-auto">
               <div className="bg-white h-80 lg:h-full rounded-xl p-4 overflow-y-auto">
-                <CaloriesBarChart
-                  dailyMacrosData={userDailyMacros}
-                  cardHeight="full"
-                />
+                <CaloriesBarChart dailyMacrosData={userDailyMacros} />
               </div>
 
               <div className="bg-white rounded-xl p-4 overflow-y-auto h-full">

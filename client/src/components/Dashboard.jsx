@@ -4,7 +4,8 @@ import { IoFootsteps } from 'react-icons/io5';
 import { GiNightSleep, GiRoastChicken } from 'react-icons/gi';
 import { useOutletContext } from 'react-router-dom';
 import ProgressWithLabel from './ProgressWithLabel';
-import Graph from './Graph';
+// import Graph from './Graph';
+import CaloriesBarChart from './Graph';
 import axios from 'axios';
 // import TrackingCalendar from "./TrackingCalendar"
 import { useAuth } from '../../context/AuthContext';
@@ -317,8 +318,8 @@ const Dashboard = () => {
             todayEntry={todayEntry}
             userGoals={userGoals}
           />
-          <div className="bg-white rounded-xl p-3 lg:col-span-3">
-            <Graph dailyMacrosData={dailyMacrosData} />
+          <div className="h-full bg-white rounded-xl p-3 lg:col-span-3">
+            <CaloriesBarChart dailyMacrosData={dailyMacrosData} />
           </div>
         </section>
 

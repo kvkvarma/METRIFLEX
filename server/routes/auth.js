@@ -1,15 +1,15 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const admin = require('../config/firebaseAdmin');
-const User = require('../models/users');
-const Trainer = require('../models/trainers');
+const admin = require("../config/firebaseAdmin");
+const User = require("../models/users");
+const Trainer = require("../models/trainers");
 
 //User Registration
-router.post('/register', async (req, res) => {
+router.post("/register", async (req, res) => {
   try {
     const decoded = await admin.auth().verifyIdToken(req.body.token);
-    if(!decoded){
-            return res.status(401).json({message: "Unauthorized"});
+    if (!decoded) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
     const uid = decoded.uid;
     let user = await User.findOne({ userId: uid });
@@ -18,7 +18,7 @@ router.post('/register', async (req, res) => {
         userId: uid,
         email: req.body.email,
         name: req.body.username || "Anonymous",
-        role: "user"
+        role: "user",
       });
       console.log("USER CREATED");
     }
@@ -30,11 +30,11 @@ router.post('/register', async (req, res) => {
 });
 
 //Trainer Registration
-router.post('/trainerregister', async (req, res) => {
+router.post("/trainerregister", async (req, res) => {
   try {
     const decoded = await admin.auth().verifyIdToken(req.body.token);
-    if(!decoded){
-            return res.status(401).json({message: "Unauthorized"});
+    if (!decoded) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
     const uid = decoded.uid;
     let trainer = await Trainer.findOne({ trainerId: uid });
@@ -50,7 +50,7 @@ router.post('/trainerregister', async (req, res) => {
       });
       console.log("Trainer Created");
     }
-    
+
     res.status(200).json({ message: "Trainer registered successfully" });
   } catch (err) {
     console.error("FAILED:", err.message);
@@ -58,74 +58,68 @@ router.post('/trainerregister', async (req, res) => {
   }
 });
 
-
-router.post('/googleSignin',async(req,res)=>{
-    try{
-        const decoded = await admin.auth().verifyIdToken(req.body.token);
-        if(!decoded){
-            return res.status(401).json({message: "Unauthorized"});
-        }
-        const uid = decoded.uid;
-        let user = await User.findOne({ userId: uid });
-        if (!user) {
-          user = await User.create({
-            userId: uid,
-            email: decoded.email,
-            name: decoded.name || "Anonymous",
-            role: "user"
-          });
-          console.log("USER CREATED VIA GOOGLE SIGNIN");
-        }
-        res.status(200).json({ user });
+router.post("/googleSignin", async (req, res) => {
+  try {
+    const decoded = await admin.auth().verifyIdToken(req.body.token);
+    if (!decoded) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
-    catch(err){
-        console.error("FAILED:", err.message);
-        res.status(401).json({ error: err.message });
+    const uid = decoded.uid;
+    let user = await User.findOne({ userId: uid });
+    if (!user) {
+      user = await User.create({
+        userId: uid,
+        email: decoded.email,
+        name: decoded.name || "Anonymous",
+        role: "user",
+      });
+      console.log("USER CREATED VIA GOOGLE SIGNIN");
     }
+    res.status(200).json({ user });
+  } catch (err) {
+    console.error("FAILED:", err.message);
+    res.status(401).json({ error: err.message });
+  }
 });
 
 //User Login
-router.post('/login',async(req,res)=>{
-    try{
-        const decoded = await admin.auth().verifyIdToken(req.body.token);
-        if(!decoded){
-            return res.status(401).json({message: "Unauthorized"});
-        }
-        const uid = decoded.uid;
-        const user = await User.findOne({userId : uid});
-        if(!user){
-          res.status(404).json({message: "User not found"});
-        }
-        else{
-            res.status(200).json({user});
-        }
+router.post("/login", async (req, res) => {
+  try {
+    const decoded = await admin.auth().verifyIdToken(req.body.token);
+    if (!decoded) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
-    catch(err){
-        console.error("FAILED:", err.message);
-        res.status(401).json({ error: err.message });
+    const uid = decoded.uid;
+    const user = await User.findOne({ userId: uid });
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+    } else {
+      res.status(200).json({ user });
     }
+  } catch (err) {
+    console.error("FAILED:", err.message);
+    res.status(401).json({ error: err.message });
+  }
 });
 
 //Trainer Login
-router.post('/trainerlogin',async(req,res)=>{
-    try{
-        const decoded = await admin.auth().verifyIdToken(req.body.token);
-        if(!decoded){
-            return res.status(401).json({message: "Unauthorized"});
-        }
-        const uid = decoded.uid;
-        const trainer = await Trainer.findOne({trainerId : uid});
-        if(!trainer){
-          res.status(404).json({message: "Trainer not found"});
-        }
-        else{
-            res.status(200).json({trainer});
-        }
+router.post("/trainerlogin", async (req, res) => {
+  try {
+    const decoded = await admin.auth().verifyIdToken(req.body.token);
+    if (!decoded) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
-    catch(err){
-        console.error("FAILED:", err.message);
-        res.status(401).json({ error: err.message });
+    const uid = decoded.uid;
+    const trainer = await Trainer.findOne({ trainerId: uid });
+    if (!trainer) {
+      res.status(404).json({ message: "Trainer not found" });
+    } else {
+      res.status(200).json({ trainer });
     }
+  } catch (err) {
+    console.error("FAILED:", err.message);
+    res.status(401).json({ error: err.message });
+  }
 });
 
 module.exports = router;

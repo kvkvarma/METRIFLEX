@@ -1,8 +1,8 @@
-"use client"
+'use client';
 
-import { TrendingUp } from "lucide-react"
-import { Pie, PieChart } from "recharts"
-import { useMemo } from "react"
+import { TrendingUp } from 'lucide-react';
+import { Pie, PieChart } from 'recharts';
+import { useMemo } from 'react';
 import {
   Card,
   CardContent,
@@ -10,44 +10,55 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from '@/components/ui/card';
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from '@/components/ui/chart';
 
-export const description = "A pie chart with no separator"
-
-
+export const description = 'A pie chart with no separator';
 
 const chartConfig = {
   chrome: {
-    label: "Chrome",
-    color: "var(--chart-1)",
+    label: 'Chrome',
+    color: 'var(--chart-1)',
   },
   safari: {
-    label: "Safari",
-    color: "var(--chart-2)",
+    label: 'Safari',
+    color: 'var(--chart-2)',
   },
   firefox: {
-    label: "Firefox",
-    color: "var(--chart-3)",
+    label: 'Firefox',
+    color: 'var(--chart-3)',
   },
-}
-export function ChartPieSeparatorNone({requestsAcceptanceRatio}) {
-const pieData = useMemo(() => {
-  return requestsAcceptanceRatio.map((item) => ({
-    browser: item.name,       
-    visitors: item.count, 
-    fill:
-      item.name === "Rejected Requests"
-        ? "var(--chart-1)"
-        : item.name === "Total Requests"
-        ? "var(--chart-2)"
-        : "var(--chart-3)",
-  }));
-}, [requestsAcceptanceRatio]);
+};
+export function ChartPieSeparatorNone({ requestsAcceptanceRatio }) {
+  const pieData = useMemo(() => {
+    return requestsAcceptanceRatio.map((item) => ({
+      browser: item.name,
+      visitors: item.count,
+      fill:
+        item.name === 'Rejected Requests'
+          ? 'var(--chart-1)'
+          : item.name === 'Total Requests'
+            ? 'var(--chart-2)'
+            : 'var(--chart-3)',
+    }));
+  }, [requestsAcceptanceRatio]);
+
+  const acceptancePercentage = useMemo(() => {
+    const totalRequests =
+      requestsAcceptanceRatio.find((item) => item.name === 'Total Requests')
+        ?.count || 0;
+    const acceptedRequests =
+      requestsAcceptanceRatio.find((item) => item.name === 'Active Requests')
+        ?.count || 0;
+
+    if (totalRequests === 0) return 0;
+
+    return ((acceptedRequests / totalRequests) * 100).toFixed(1);
+  }, [requestsAcceptanceRatio]);
 
   return (
     <Card className="flex flex-col w-full">
@@ -74,11 +85,10 @@ const pieData = useMemo(() => {
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center leading-none font-medium">
-          Acceptance Percentage : 
+        <div className="flex items-center leading-none font-medium text-green-500">
+          Acceptance Percentage : {acceptancePercentage}%
         </div>
-        
       </CardFooter>
     </Card>
-  )
+  );
 }

@@ -49,6 +49,8 @@ const userSchema = new mongoose.Schema(
     role: { type: String, required: true, default: "user" },
 
     trainerMessages: { type: [messsages], default: [] },
+
+    trainerAssigned: { type: String, default: null },
   },
   { timestamps: true },
 );

@@ -1,21 +1,69 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const axios = require('axios');
-const DailyMacros = require('../models/dailymacors');
-const users = require('../models/users');
+const axios = require("axios");
+const DailyMacros = require("../models/dailymacors");
+const users = require("../models/users");
+const FoodMacros = require("../models/foodmacros");
 
 router.get("/getFoodMacros", async (req, res) => {
   try {
     const foodItem = req.query.foodItem;
 
     if (!foodItem) {
-      return res.status(200).json({ message: "No food item provided" });
+      return res.status(400).json({ message: "No food item provided" });
+    }
+
+    const lowerFood = foodItem.toLowerCase();
+    const existingFood = await FoodMacros.findOne({ foodItem: lowerFood });
+    if (existingFood) {
+      return res.status(200).json({
+        food: existingFood.foodItem,
+        nutrients: [
+          { nutrientName: "Protein", value: existingFood.Protein },
+          {
+            nutrientName: "Carbohydrate, by difference",
+            value: existingFood.Carbohydrate,
+          },
+          { nutrientName: "Total lipid (fat)", value: existingFood.Fats },
+          { nutrientName: "Fiber, total dietary", value: existingFood.Fiber },
+          { nutrientName: "Energy", value: existingFood.calories },
+        ],
+      });
     }
 
     const response = await axios.post(
       `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${process.env.USDA_API_KEY}`,
-      { query: foodItem, pageSize: 1 }
+      { query: foodItem, pageSize: 1 },
     );
+
+    await FoodMacros.create({
+      foodItem: foodItem.toLowerCase(),
+      Protein: parseInt(
+        response.data.foods[0].foodNutrients.find(
+          (n) => n.nutrientName === "Protein",
+        )?.value || 0,
+      ),
+      Carbohydrate: parseInt(
+        response.data.foods[0].foodNutrients.find(
+          (n) => n.nutrientName === "Carbohydrate, by difference",
+        )?.value || 0,
+      ),
+      Fats: parseInt(
+        response.data.foods[0].foodNutrients.find(
+          (n) => n.nutrientName === "Total lipid (fat)",
+        )?.value || 0,
+      ),
+      Fiber: parseInt(
+        response.data.foods[0].foodNutrients.find(
+          (n) => n.nutrientName === "Fiber, total dietary",
+        )?.value || 0,
+      ),
+      calories: parseInt(
+        response.data.foods[0].foodNutrients.find(
+          (n) => n.nutrientName === "Energy",
+        )?.value || 0,
+      ),
+    });
 
     if (!response.data.foods || response.data.foods.length === 0) {
       return res.status(404).json({ message: "Food not found" });
@@ -23,7 +71,7 @@ router.get("/getFoodMacros", async (req, res) => {
 
     return res.status(200).json({
       food: response.data.foods[0].description,
-      nutrients: response.data.foods[0].foodNutrients
+      nutrients: response.data.foods[0].foodNutrients,
     });
   } catch (err) {
     console.error("USDA API Error:", err.message);
@@ -31,7 +79,7 @@ router.get("/getFoodMacros", async (req, res) => {
   }
 });
 
-router.get('/getDailyMacros', async (req, res) => {
+router.get("/getDailyMacros", async (req, res) => {
   try {
     const userId = req.query.user;
 
@@ -39,22 +87,22 @@ router.get('/getDailyMacros', async (req, res) => {
       return res.status(400).json({ error: "UserID Required!" });
     }
 
-    const dailyMacrosOfUser = await DailyMacros
-      .find({ userId })
-      .sort({ date: 1 });
+    const dailyMacrosOfUser = await DailyMacros.find({ userId }).sort({
+      date: 1,
+    });
 
     return res.status(200).json({
-      userDailyMacrosData: dailyMacrosOfUser
+      userDailyMacrosData: dailyMacrosOfUser,
     });
   } catch (err) {
     console.error("Error fetching daily macros:", err.message);
     return res.status(500).json({
-      error: "Failed to fetch daily macros"
+      error: "Failed to fetch daily macros",
     });
   }
 });
 
-router.get('/getMAcroGoals', async (req, res) => {
+router.get("/getMAcroGoals", async (req, res) => {
   try {
     const userId = req.query.user;
     if (!userId) {
@@ -64,69 +112,74 @@ router.get('/getMAcroGoals', async (req, res) => {
     const goalsOfUser = await users.findOne({ userId });
 
     return res.status(200).json({
-      macroGoals: goalsOfUser
+      macroGoals: goalsOfUser,
     });
   } catch (err) {
     console.error("Error fetching user goals:", err.message);
     return res.status(500).json({
-      error: "Failed to fetch user goals"
+      error: "Failed to fetch user goals",
     });
   }
 });
 
-router.post('/updateUserGoals', async (req, res) => {
+router.post("/updateUserGoals", async (req, res) => {
   try {
     const { userId, updatedGoalValues } = req.body;
     if (!userId || !updatedGoalValues) {
       return res.status(400).json({ message: "Missing userId or goal data" });
     }
-    const user = await users.findOne({userId});
+    const user = await users.findOne({ userId });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
     user.goal = {
       ...user.goal,
-      ...updatedGoalValues
+      ...updatedGoalValues,
     };
     await user.save();
     res.status(200).json({
-      message: "User goals updated successfully"});
+      message: "User goals updated successfully",
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
 
-
-router.post('/addtodaymetrics',async(req,res)=>{
-  try{
-    const {userId,water,steps,bpm,sleep} = req.body;
-    const date = new Date().toISOString().split('T')[0];
-    if(!userId){
-      return res.status(400).json({error : "UserId Required!"});
+router.post("/addtodaymetrics", async (req, res) => {
+  try {
+    const { userId, water, steps, bpm, sleep } = req.body;
+    const date = new Date().toISOString().split("T")[0];
+    if (!userId) {
+      return res.status(400).json({ error: "UserId Required!" });
     }
-    await DailyMacros.findOneAndUpdate({userId,date},{
-      $inc:{
-        sleep:sleep,
-        steps:steps,
-        water:water
-      }
-    },{ upsert: true, new: true })
-    return res.status(200).json({message: "Cardio Metrics Added Successfully!"});
+    await DailyMacros.findOneAndUpdate(
+      { userId, date },
+      {
+        $inc: {
+          sleep: sleep,
+          steps: steps,
+          water: water,
+        },
+      },
+      { upsert: true, new: true },
+    );
+    return res
+      .status(200)
+      .json({ message: "Cardio Metrics Added Successfully!" });
+  } catch (err) {
+    return res.status(500).json({ err: "Failed to addC Cardio Metrics" });
   }
-  catch(err){
-    return res.status(500).json({err:"Failed to addC Cardio Metrics"})
-  }
-})
+});
 
-router.post('/addFoodMacros', async (req, res) => {
+router.post("/addFoodMacros", async (req, res) => {
   try {
     const { macros, userId } = req.body;
     if (!macros || !userId) {
       return res.status(400).json({ error: "Invalid request data" });
     }
-    console.log("Carbs : ",macros.carbs);
-    const date = new Date().toISOString().split('T')[0];
+    console.log("Carbs : ", macros.carbs);
+    const date = new Date().toISOString().split("T")[0];
     await DailyMacros.findOneAndUpdate(
       { userId, date },
       {
@@ -135,19 +188,19 @@ router.post('/addFoodMacros', async (req, res) => {
           carbs: macros.carbs || 0,
           fats: macros.fats || 0,
           fibre: macros.fibre || 0,
-          calories: macros.calories || 0
-        }
+          calories: macros.calories || 0,
+        },
       },
-      { upsert: true, new: true }
+      { upsert: true, new: true },
     );
 
     return res.status(200).json({
-      message: "Food macros added/updated successfully"
+      message: "Food macros added/updated successfully",
     });
   } catch (err) {
     console.error("Error adding macros:", err.message);
     return res.status(500).json({
-      error: "Failed to add food macros"
+      error: "Failed to add food macros",
     });
   }
 });

@@ -126,10 +126,17 @@ router.post("/addclienttotrainer", async (req, res) => {
       name: name,
       goal: goal,
     });
+
     await Trainers.findOneAndUpdate(
       { trainerId: trainerID },
       { $inc: { totalactiveclients: 1 } },
     );
+
+    await User.findOneAndUpdate(
+      { userId: userId },
+      { $set: { trainerAssigned: trainerID } },
+    );
+
     await trainer.save();
     return res.status(200).json({
       newClient: { userId, name, goal },
@@ -189,7 +196,7 @@ router.post("/updateworkoutsplit", async (req, res) => {
   }
 });
 
-router.post("/removeclientrequests", async (req, res) => {
+router.post("/removeclientrequest", async (req, res) => {
   try {
     const { trainerID, id } = req.body;
     const trainer = await Trainers.findOne({ trainerId: trainerID });

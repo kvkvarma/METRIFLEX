@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { useAuth } from "../../context/AuthContext";
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useAuth } from '../../context/AuthContext';
 
 const Macros = () => {
-  const [foodItem, setFoodItem] = useState("");
+  const [foodItem, setFoodItem] = useState('');
   const [macros, setMacros] = useState({
     protein: 0,
     carbs: 0,
@@ -17,7 +17,7 @@ const Macros = () => {
   const getMacros = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8080/macros/getFoodMacros",
+        'http://localhost:8080/macros/getFoodMacros',
         { params: { foodItem } }
       );
 
@@ -25,40 +25,43 @@ const Macros = () => {
       console.log(response.data.nutrients);
       setMacros({
         protein: parseInt(
-          nutrients.find(n => n.nutrientName === "Protein")?.value || 0
+          nutrients.find((n) => n.nutrientName === 'Protein')?.value || 0
         ),
         carbs: parseInt(
-          nutrients.find(n => n.nutrientName === "Carbohydrate, by difference")?.value || 0
+          nutrients.find(
+            (n) => n.nutrientName === 'Carbohydrate, by difference'
+          )?.value || 0
         ),
         fats: parseInt(
-          nutrients.find(n => n.nutrientName === "Total lipid (fat)")?.value || 0
+          nutrients.find((n) => n.nutrientName === 'Total lipid (fat)')
+            ?.value || 0
         ),
         fibre: parseInt(
-          nutrients.find(n => n.nutrientName === "Fiber, total dietary")?.value || 0
+          nutrients.find((n) => n.nutrientName === 'Fiber, total dietary')
+            ?.value || 0
         ),
         calories: parseInt(
-          nutrients.find(n => n.nutrientName === "Energy")?.value || 0
+          nutrients.find((n) => n.nutrientName === 'Energy')?.value || 0
         ),
       });
     } catch (err) {
-      console.error("Error fetching macros:", err.message);
+      console.error('Error fetching macros:', err.message);
     }
   };
 
   const addMacros = async () => {
     try {
-      await axios.post("http://localhost:8080/macros/addFoodMacros", {
+      await axios.post('http://localhost:8080/macros/addFoodMacros', {
         macros,
         userId: user.uid,
       });
     } catch (err) {
-      console.error("Error adding macros:", err.message);
+      console.error('Error adding macros:', err.message);
     }
   };
 
   return (
     <div className="min-h-screen bg-[#F7F7F7] relative">
-
       {/* EXIT BUTTON */}
       <button
         className="fixed top-4 right-4 px-4 py-2 bg-red-900 text-white rounded-lg text-sm hover:opacity-90 z-10"
@@ -70,7 +73,6 @@ const Macros = () => {
       {/* CENTERED CARD */}
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-sm p-6">
-
           {/* HEADER */}
           <div className="mb-5">
             <h2 className="text-lg font-semibold text-[#111111]">
@@ -122,7 +124,6 @@ const Macros = () => {
           >
             Add to Daily Nutrition
           </button>
-
         </div>
       </div>
     </div>
@@ -133,9 +134,7 @@ const Macros = () => {
 const MacroStat = ({ label, value }) => (
   <div className="bg-[#F7F7F7] rounded-xl p-3 text-center">
     <p className="text-xs text-[#6B7280]">{label}</p>
-    <p className="text-lg font-semibold text-[#111111]">
-      {value}g
-    </p>
+    <p className="text-lg font-semibold text-[#111111]">{value}g</p>
   </div>
 );
 

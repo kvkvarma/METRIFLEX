@@ -12,6 +12,7 @@ import {
 /**
  * Tailwind-safe height map
  */
+
 const heightMap = {
   full: 'h-full',
   54: 'h-54',
@@ -48,7 +49,9 @@ export default function CaloriesBarChart({
     macro === 'protein' ? '#22c55e' : macro === 'carbs' ? '#f59e0b' : '#ef4444';
 
   return (
-    <Card className={`${heightMap[cardHeight]} overflow-hidden flex flex-col`}>
+    <Card
+      className={`overflow-hidden flex flex-col ${heightMap[cardHeight] || heightMap.full}`}
+    >
       {/* ================= HEADER ================= */}
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-semibold">Macros Intake</CardTitle>
