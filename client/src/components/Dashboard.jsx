@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { use, useEffect, useMemo, useState } from 'react';
 import { FaHeart } from 'react-icons/fa6';
 import { IoFootsteps } from 'react-icons/io5';
 import { GiNightSleep, GiRoastChicken } from 'react-icons/gi';
@@ -25,7 +25,8 @@ const Dashboard = () => {
   const [trainers, setTrainers] = useState([]);
   const navigate = useNavigate();
   const [todayPopUp, setTodayPopup] = useState(false);
-
+  const [userDetails, setUserDetails] = useState({});
+  const [trainerDetails, setTrainerDetails] = useState([]);
   const [cardioMetrics, setCardioMetrics] = useState({
     water: 0,
     steps: 0,
@@ -72,6 +73,14 @@ const Dashboard = () => {
           'http://localhost:8080/trainer/getTrainers'
         );
 
+        const userDetails = await axios.get(
+          'http://localhost:8080/user/getuserdetails',
+          {
+            params: { userId: user.uid },
+          }
+        );
+
+        setUserDetails(userDetails.data.userDetails);
         setTrainers(res.data.trainers);
 
         setDailyMacrosData(dailyMacrosResponse.data.userDailyMacrosData);
@@ -90,6 +99,25 @@ const Dashboard = () => {
 
     fetchData();
   }, [user]);
+
+  useEffect(() => {
+    if (!userDetails.trainerAssigned) return;
+    const fetchTrainerDetails = async () => {
+      try {
+        const response = await axios.get(
+          'http://localhost:8080/trainer/getTrainerDetails',
+          {
+            params: { trainerId: userDetails.trainerAssigned },
+          }
+        );
+
+        setTrainerDetails(response.data.trainerDetails);
+      } catch (err) {
+        console.error('Error fetching trainer details:', err.message);
+      }
+    };
+    fetchTrainerDetails();
+  }, [userDetails.trainerAssigned]);
 
   const newMacros = dailyMacrosData.map((item) => ({
     date: item.date,
@@ -410,58 +438,64 @@ const Dashboard = () => {
                 View More
               </button>
             </div>
+            {userDetails.trainerAssigned && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6 lg:flex-1 lg:min-h-0 p-1">
+                <p>Trainer Name : {trainerDetails.name}</p>
+              </div>
+            )}
+            {!userDetails.trainerAssigned && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6 lg:flex-1 lg:min-h-0 p-1">
+                {trainers.map((item) => (
+                  <div
+                    key={item.trainerId}
+                    className="bg-white rounded-2xl shadow-md  p-6 flex flex-col justify-between border border-gray-100"
+                  >
+                    {/* Top Section */}
+                    <div>
+                      <div className="flex items-center justify-between">
+                        {/* Initial Circle */}
+                        <div className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-900 text-white font-semibold text-lg">
+                          {item.name?.charAt(0)}
+                        </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6 lg:flex-1 lg:min-h-0 p-1">
-              {trainers.map((item) => (
-                <div
-                  key={item.trainerId}
-                  className="bg-white rounded-2xl shadow-md  p-6 flex flex-col justify-between border border-gray-100"
-                >
-                  {/* Top Section */}
-                  <div>
-                    <div className="flex items-center justify-between">
-                      {/* Initial Circle */}
-                      <div className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-900 text-white font-semibold text-lg">
-                        {item.name?.charAt(0)}
+                        {/* Experience Badge */}
+                        <span className="text-xs px-3 py-1 rounded-full bg-red-100 text-red-600 font-medium">
+                          {item.experience} yrs exp
+                        </span>
                       </div>
 
-                      {/* Experience Badge */}
-                      <span className="text-xs px-3 py-1 rounded-full bg-red-100 text-red-600 font-medium">
-                        {item.experience} yrs exp
-                      </span>
+                      {/* Name */}
+                      <h3 className="mt-4 text-lg font-semibold text-gray-800">
+                        {item.name}
+                      </h3>
+
+                      {/* Age & Gender */}
+                      <div className="mt-2 flex gap-4 text-sm text-gray-500">
+                        <p>{item.age} years</p>
+                        <p>{item.gender}</p>
+                      </div>
+
+                      {/* Speciality */}
+                      <div className="mt-3">
+                        <span className="inline-block px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-700 font-medium">
+                          {item.speciality}
+                        </span>
+                      </div>
+
+                      {/* Description */}
+                      <p className="mt-3 text-sm text-gray-500 leading-relaxed line-clamp-3 overflow-auto">
+                        {item.description}
+                      </p>
                     </div>
 
-                    {/* Name */}
-                    <h3 className="mt-4 text-lg font-semibold text-gray-800">
-                      {item.name}
-                    </h3>
-
-                    {/* Age & Gender */}
-                    <div className="mt-2 flex gap-4 text-sm text-gray-500">
-                      <p>{item.age} years</p>
-                      <p>{item.gender}</p>
-                    </div>
-
-                    {/* Speciality */}
-                    <div className="mt-3">
-                      <span className="inline-block px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-700 font-medium">
-                        {item.speciality}
-                      </span>
-                    </div>
-
-                    {/* Description */}
-                    <p className="mt-3 text-sm text-gray-500 leading-relaxed line-clamp-3 overflow-auto">
-                      {item.description}
-                    </p>
+                    {/* Button */}
+                    <button className="mt-6 w-full bg-red-600 text-white py-2.5 rounded-xl hover:bg-red-700 transition-all font-medium text-sm">
+                      View Profile
+                    </button>
                   </div>
-
-                  {/* Button */}
-                  <button className="mt-6 w-full bg-red-600 text-white py-2.5 rounded-xl hover:bg-red-700 transition-all font-medium text-sm">
-                    View Profile
-                  </button>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
       </div>

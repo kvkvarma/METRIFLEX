@@ -223,4 +223,21 @@ router.post("/removeclientrequest", async (req, res) => {
     return res.status(500).json({ message: err.message });
   }
 });
+
+router.get("/getTrainerDetails", async (req, res) => {
+  try {
+    const { trainerId } = req.query;
+    const trainer = await Trainers.findOne({ trainerId: trainerId });
+    if (!trainer) {
+      return res.status(404).json({ message: "Trainer Not Found" });
+    }
+    return res.status(200).json({ trainerDetails: trainer });
+  } catch (err) {
+    console.log("Error fetching the trainer details");
+    return res
+      .status(500)
+      .json({ message: "Error fetching the trainer details" });
+  }
+});
+
 module.exports = router;
