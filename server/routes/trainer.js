@@ -158,7 +158,6 @@ router.post("/messagetoclient", async (req, res) => {
       return res.status(400).json({ message: "User Not Found" });
     }
     user.trainerMessages.push({
-      id: userId,
       message: message,
     });
     await user.save();

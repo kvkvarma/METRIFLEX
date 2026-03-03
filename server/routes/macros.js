@@ -160,6 +160,7 @@ router.post("/addtodaymetrics", async (req, res) => {
           sleep: sleep,
           steps: steps,
           water: water,
+          bpm: bpm,
         },
       },
       { upsert: true, new: true },

@@ -1,7 +1,6 @@
-// "use client"
 import { useState } from 'react';
 import * as React from 'react';
-import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -21,7 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-export const description = 'An interactive area chart';
+export const description = 'An interactive area chart with dual axes';
 
 const chartConfig = {
   visitors: {
@@ -29,11 +28,11 @@ const chartConfig = {
   },
   steps: {
     label: 'Steps',
-    color: 'var(--chart-1)',
+    color: 'hsl(var(--chart-1))',
   },
   caloriesburned: {
-    label: 'Calories Burned',
-    color: 'var(--chart-2)',
+    label: 'Calories',
+    color: 'hsl(var(--chart-2))',
   },
 };
 
@@ -63,52 +62,98 @@ export function ChartAreaInteractive({ details }) {
     return date >= startDate;
   });
 
+  // Calculate stats
+  const totalSteps = filteredData.reduce((acc, curr) => acc + curr.steps, 0);
+  const totalCalories = filteredData.reduce(
+    (acc, curr) => acc + curr.caloriesburned,
+    0
+  );
+  const avgSteps = Math.round(totalSteps / filteredData.length) || 0;
+  const avgCalories = Math.round(totalCalories / filteredData.length) || 0;
+
   return (
-    <Card className="pt-0 border-0 shadow-none">
-      <CardHeader className="flex items-center gap-2 mt-0 pb-2 border-b sm:flex-row">
-        <div className="grid flex-1 gap-1">
-          <CardTitle className="text-sm font-semibold text-gray-800">
-            Activity Chart
-          </CardTitle>
+    <Card className="border-0 shadow-none h-full flex flex-col bg-gradient-to-br from-white to-gray-50">
+      {/* Header */}
+      <CardHeader className="flex-shrink-0 pb-3">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-red-300 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
+              <svg
+                className="w-5 h-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
+              </svg>
+            </div>
+            <div>
+              <CardTitle className="text-base font-bold text-gray-900">
+                Activity Trends
+              </CardTitle>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Track your progress over time
+              </p>
+            </div>
+          </div>
+
+          <Select value={timeRange} onValueChange={setTimeRange}>
+            <SelectTrigger className="w-[110px] h-9 rounded-lg border-2 border-gray-200 hover:border-gray-300 transition-colors bg-white shadow-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl border-2 shadow-lg">
+              <SelectItem value="30d" className="rounded-lg cursor-pointer">
+                <span className="flex items-center gap-2">30 days</span>
+              </SelectItem>
+              <SelectItem value="7d" className="rounded-lg cursor-pointer">
+                <span className="flex items-center gap-2">7 days</span>
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
-        <Select value={timeRange} onValueChange={setTimeRange}>
-          <SelectTrigger
-            className="w-[120px] rounded-lg text-xs h-8"
-            aria-label="Select a value"
-          >
-            <SelectValue placeholder="Last 30 days" />
-          </SelectTrigger>
+        {/* Stats Bar */}
+        <div className="grid grid-cols-2 gap-3 mt-4">
+          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-3 border-2 border-blue-100">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+              <p className="text-xs font-semibold text-gray-600">Steps</p>
+            </div>
+            <p className="text-lg font-bold text-red-600">
+              {avgSteps.toLocaleString()}
+            </p>
+            <p className="text-xs text-gray-500">avg/day</p>
+          </div>
 
-          <SelectContent className="rounded-xl">
-            <SelectItem value="30d" className="rounded-lg text-xs">
-              30 days
-            </SelectItem>
-            <SelectItem value="7d" className="rounded-lg text-xs">
-              1 week
-            </SelectItem>
-          </SelectContent>
-        </Select>
+          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-3 border-2 border-purple-100">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-2 h-2 bg-green-300 rounded-full"></div>
+              <p className="text-xs font-semibold text-gray-600">Calories</p>
+            </div>
+            <p className="text-lg font-bold text-green-600">
+              {avgCalories.toLocaleString()}
+            </p>
+            <p className="text-xs text-gray-500">avg/day</p>
+          </div>
+        </div>
       </CardHeader>
 
-      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-        <ChartContainer
-          config={chartConfig}
-          className="aspect-auto h-[200px] w-full"
-        >
-          <AreaChart data={filteredData}>
+      {/* Chart */}
+      <CardContent className="flex-1 px-4 pb-4 min-h-0">
+        <ChartContainer config={chartConfig} className="h-full w-full">
+          <AreaChart
+            data={filteredData}
+            margin={{ top: 10, right: 50, left: 0, bottom: 0 }}
+          >
             <defs>
               <linearGradient id="fillsteps" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-steps)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-steps)"
-                  stopOpacity={0.1}
-                />
+                <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.5} />
+                <stop offset="95%" stopColor="#3B82F6" stopOpacity={0.1} />
               </linearGradient>
 
               <linearGradient
@@ -118,27 +163,25 @@ export function ChartAreaInteractive({ details }) {
                 x2="0"
                 y2="1"
               >
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-caloriesburned)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-caloriesburned)"
-                  stopOpacity={0.1}
-                />
+                <stop offset="5%" stopColor="#A855F7" stopOpacity={0.5} />
+                <stop offset="95%" stopColor="#A855F7" stopOpacity={0.1} />
               </linearGradient>
             </defs>
 
-            <CartesianGrid vertical={false} />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              vertical={false}
+              stroke="#E5E7EB"
+              opacity={0.5}
+            />
 
             <XAxis
               dataKey="date"
               tickLine={false}
               axisLine={false}
-              tickMargin={8}
+              tickMargin={10}
               minTickGap={32}
+              tick={{ fill: '#6B7280', fontSize: 11 }}
               tickFormatter={(value) => {
                 const date = new Date(value);
                 return date.toLocaleDateString('en-US', {
@@ -148,36 +191,90 @@ export function ChartAreaInteractive({ details }) {
               }}
             />
 
+            {/* Left Y-axis for Steps */}
+            <YAxis
+              yAxisId="left"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={10}
+              tick={{ fill: '#3B82F6', fontSize: 11, fontWeight: 600 }}
+              tickFormatter={(value) => {
+                if (value >= 1000) return `${(value / 1000).toFixed(1)}k`;
+                return value;
+              }}
+            />
+
+            {/* Right Y-axis for Calories */}
+            <YAxis
+              yAxisId="right"
+              orientation="right"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={10}
+              tick={{ fill: '#A855F7', fontSize: 11, fontWeight: 600 }}
+              tickFormatter={(value) => {
+                if (value >= 1000) return `${(value / 1000).toFixed(1)}k`;
+                return value;
+              }}
+            />
+
             <ChartTooltip
-              cursor={false}
+              cursor={{
+                stroke: '#9CA3AF',
+                strokeWidth: 1,
+                strokeDasharray: '5 5',
+              }}
               content={
                 <ChartTooltipContent
+                  className="bg-white border-2 border-gray-200 shadow-xl rounded-xl"
                   labelFormatter={(value) => {
                     return new Date(value).toLocaleDateString('en-US', {
+                      weekday: 'short',
                       month: 'short',
                       day: 'numeric',
                     });
                   }}
-                  indicator="dot"
+                  indicator="line"
                 />
               }
             />
 
             <Area
-              dataKey="caloriesburned"
-              type="natural"
-              fill="url(#fillcaloriesburned)"
-              stroke="var(--color-caloriesburned)"
+              yAxisId="left"
+              dataKey="steps"
+              type="monotone"
+              fill="url(#fillsteps)"
+              stroke="#3B82F6"
+              strokeWidth={3}
+              dot={false}
+              activeDot={{
+                r: 6,
+                fill: '#3B82F6',
+                stroke: '#fff',
+                strokeWidth: 2,
+              }}
             />
 
             <Area
-              dataKey="steps"
-              type="natural"
-              fill="url(#fillsteps)"
-              stroke="var(--color-steps)"
+              yAxisId="right"
+              dataKey="caloriesburned"
+              type="monotone"
+              fill="url(#fillcaloriesburned)"
+              stroke="#A855F7"
+              strokeWidth={3}
+              dot={false}
+              activeDot={{
+                r: 6,
+                fill: '#A855F7',
+                stroke: '#fff',
+                strokeWidth: 2,
+              }}
             />
 
-            <ChartLegend content={<ChartLegendContent />} />
+            <ChartLegend
+              content={<ChartLegendContent className="mt-4" />}
+              wrapperStyle={{ paddingTop: '16px' }}
+            />
           </AreaChart>
         </ChartContainer>
       </CardContent>

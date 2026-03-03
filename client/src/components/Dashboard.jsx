@@ -33,7 +33,8 @@ const Dashboard = () => {
     bpm: 0,
     sleep: 0,
   });
-
+  const [trainerMessages, setTrainerMessages] = useState([]);
+  const [messageToTrainer, setMessageToTrainer] = useState('');
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCardioMetrics((prev) => ({
@@ -79,10 +80,8 @@ const Dashboard = () => {
             params: { userId: user.uid },
           }
         );
-
         setUserDetails(userDetails.data.userDetails);
         setTrainers(res.data.trainers);
-
         setDailyMacrosData(dailyMacrosResponse.data.userDailyMacrosData);
         setTargetUserGoals(userGoalsResponse.data.macroGoals.goal);
         setWorkoutSplit(userGoalsResponse.data.macroGoals.workoutSplit);
@@ -100,6 +99,49 @@ const Dashboard = () => {
     fetchData();
   }, [user]);
 
+  const sendMessageToTrainer = async () => {
+    try {
+      const res = axios.post(
+        'http://localhost:8080/user/sendmessagetotrainer',
+        { trainerId: trainerDetails.trainerId, message: messageToTrainer }
+      );
+      setMessageToTrainer('');
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
+  const clearTrainerMessages = () => {
+    try {
+      const res = axios.post(
+        'http://localhost:8080/user/cleartrainermessages',
+        { userId: user.uid }
+      );
+      setTimeout(() => {
+        setTrainerMessages([]);
+      }, 300);
+    } catch (err) {
+      console.log('Error clearing trainer Messages', err.message);
+    }
+  };
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const getMessages = await axios.get(
+          'http://localhost:8080/user/gettrainermessages',
+          {
+            params: { userId: user.uid },
+          }
+        );
+        setTrainerMessages(getMessages.data.trainerMessages);
+        console.log('Trainer Messages: ', getMessages.data.trainerMessages);
+      } catch (err) {
+        console.error('Error fetching messages:', err.message);
+      }
+    };
+    fetchMessages();
+  }, [trainerMessages]);
+
   useEffect(() => {
     if (!userDetails.trainerAssigned) return;
     const fetchTrainerDetails = async () => {
@@ -110,7 +152,6 @@ const Dashboard = () => {
             params: { trainerId: userDetails.trainerAssigned },
           }
         );
-
         setTrainerDetails(response.data.trainerDetails);
       } catch (err) {
         console.error('Error fetching trainer details:', err.message);
@@ -129,6 +170,7 @@ const Dashboard = () => {
     sleep: item.sleep,
     water: item.water,
     caloriesburned: item.caloriesburned,
+    bpm: item.bpm,
   }));
 
   const userGoals = {
@@ -292,36 +334,43 @@ const Dashboard = () => {
               setTodayPopup={setTodayPopup}
             />
           </div>
-
-          <div className="bg-white h-20 rounded-xl p-3 flex flex-col justify-between">
+          <div className="bg-white h-20 rounded-xl p-3 flex flex-col justify-between shadow-sm">
             <span className="text-xs font-medium">Sleep</span>
             <div className="flex items-center gap-2">
               <GiNightSleep size={18} color="#191970" />
-              <span className="text-lg font-semibold">6.8 hr</span>
+              <span className="text-lg font-semibold">
+                {todayEntry?.sleep ?? 0} hr
+              </span>
             </div>
           </div>
 
-          <div className="bg-white h-20 rounded-xl p-3 flex flex-col justify-between">
+          <div className="bg-white h-20 rounded-xl p-3 flex flex-col justify-between shadow-sm">
             <span className="text-xs font-medium">Steps</span>
             <div className="flex items-center gap-2">
               <IoFootsteps size={18} color="brown" />
-              <span className="text-lg font-semibold">2376</span>
+              <span className="text-lg font-semibold">
+                {todayEntry?.steps ?? 0}
+              </span>
             </div>
           </div>
 
-          <div className="bg-white h-20 rounded-xl p-3 flex flex-col justify-between">
+          <div className="bg-white h-20 rounded-xl p-3 flex flex-col justify-between shadow-sm">
             <span className="text-xs font-medium">Food</span>
             <div className="flex items-center gap-2">
               <GiRoastChicken size={18} color="#D27D2D" />
-              <span className="text-lg font-semibold">1200 Kcal</span>
+              <span className="text-lg font-semibold">
+                {todayEntry?.calories ?? 0} kcal
+              </span>
             </div>
           </div>
 
-          <div className="bg-white h-20 rounded-xl p-3 flex flex-col justify-between">
+          <div className="bg-white h-20 rounded-xl p-3 flex flex-col justify-between shadow-sm">
             <span className="text-xs font-medium">Heart</span>
             <div className="flex items-center gap-2">
               <FaHeart size={16} color="red" />
-              <span className="text-lg font-semibold">63 bpm</span>
+              <span className="text-lg font-semibold">
+                {todayEntry?.bpm ?? 0} bpm
+              </span>
             </div>
           </div>
         </section>
@@ -346,7 +395,7 @@ const Dashboard = () => {
             todayEntry={todayEntry}
             userGoals={userGoals}
           />
-          <div className="h-full bg-white rounded-xl p-3 lg:col-span-3">
+          <div className="h-72 md:h-full lg:h-full bg-white rounded-xl p-3 lg:col-span-3">
             <CaloriesBarChart dailyMacrosData={dailyMacrosData} />
           </div>
         </section>
@@ -361,7 +410,7 @@ const Dashboard = () => {
           </div>
 
           {/* Workout Statistics */}
-          <div className="bg-white rounded-2xl p-4 shadow-sm flex flex-col lg:min-h-0">
+          <div className="bg-white rounded-2xl p-4 shadow-sm flex flex-col h-96 md:h-full lg:min-h-0">
             <div className="flex justify-between items-center mb-4">
               <h2 className="font-semibold text-gray-800 text-sm">
                 Bro Split Plan
@@ -425,12 +474,10 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-
-          <div className="bg-white rounded-2xl p-3 shadow-sm flex flex-col lg:min-h-0">
-            <div className="flex justify-between items-center mb-3 flex-shrink-0">
-              <h2 className="font-semibold text-gray-800 text-sm">
-                Popular trainer
-              </h2>
+          <div className="bg-white rounded-2xl p-4 shadow-sm flex flex-col gap-4">
+            {/* Header */}
+            <div className="flex justify-between items-center">
+              <h2 className="font-semibold text-gray-800 text-sm">Trainer</h2>
               <button
                 onClick={() => navigate('/trainers')}
                 className="text-xs text-gray-400 border-2 px-2 py-1 rounded-xl cursor-pointer hover:border-gray-600 transition-colors"
@@ -438,64 +485,87 @@ const Dashboard = () => {
                 View More
               </button>
             </div>
-            {userDetails.trainerAssigned && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6 lg:flex-1 lg:min-h-0 p-1">
-                <p>Trainer Name : {trainerDetails.name}</p>
-              </div>
-            )}
-            {!userDetails.trainerAssigned && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6 lg:flex-1 lg:min-h-0 p-1">
-                {trainers.map((item) => (
-                  <div
-                    key={item.trainerId}
-                    className="bg-white rounded-2xl shadow-md  p-6 flex flex-col justify-between border border-gray-100"
-                  >
-                    {/* Top Section */}
-                    <div>
-                      <div className="flex items-center justify-between">
-                        {/* Initial Circle */}
-                        <div className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-900 text-white font-semibold text-lg">
-                          {item.name?.charAt(0)}
-                        </div>
 
-                        {/* Experience Badge */}
-                        <span className="text-xs px-3 py-1 rounded-full bg-red-100 text-red-600 font-medium">
-                          {item.experience} yrs exp
-                        </span>
-                      </div>
-
-                      {/* Name */}
-                      <h3 className="mt-4 text-lg font-semibold text-gray-800">
-                        {item.name}
-                      </h3>
-
-                      {/* Age & Gender */}
-                      <div className="mt-2 flex gap-4 text-sm text-gray-500">
-                        <p>{item.age} years</p>
-                        <p>{item.gender}</p>
-                      </div>
-
-                      {/* Speciality */}
-                      <div className="mt-3">
-                        <span className="inline-block px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-700 font-medium">
-                          {item.speciality}
-                        </span>
-                      </div>
-
-                      {/* Description */}
-                      <p className="mt-3 text-sm text-gray-500 leading-relaxed line-clamp-3 overflow-auto">
-                        {item.description}
-                      </p>
+            {/* ================= TOP SPLIT ================= */}
+            {/* Assigned Trainer Section */}
+            <div className="bg-white rounded-2xl p-2 ">
+              {userDetails.trainerAssigned ? (
+                <div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 flex items-center justify-center rounded-full bg-blue-900 text-white font-semibold text-xl">
+                      {trainerDetails.name?.charAt(0)}
                     </div>
 
-                    {/* Button */}
-                    <button className="mt-6 w-full bg-red-600 text-white py-2.5 rounded-xl hover:bg-red-700 transition-all font-medium text-sm">
-                      View Profile
-                    </button>
+                    <div>
+                      <h3 className="text-lg font-semibold">
+                        {trainerDetails.name}
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        {trainerDetails.experience} yrs exp
+                      </p>
+                    </div>
                   </div>
-                ))}
+
+                  <p className="mt-3 text-sm text-gray-600">
+                    {trainerDetails.speciality}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500">
+                  No trainer assigned yet.
+                </p>
+              )}
+            </div>
+            <hr />
+            {/* ================= BOTTOM SPLIT ================= */}
+            {/* Messages Section */}
+            {/* ================= BOTTOM SPLIT ================= */}
+            <div className="bg-white rounded-2xl flex flex-col gap-2 h-52">
+              <h3 className="font-semibold text-sm mb-1 flex-shrink-0">
+                Trainer Messages
+              </h3>
+
+              {/* Scrollable Message Area */}
+              <div className="flex-1 overflow-y-auto flex flex-col gap-2 pr-1">
+                {trainerMessages.length === 0 ? (
+                  <p className="text-sm text-gray-500 flex justify-center align-middle">
+                    No messages from trainer yet.
+                  </p>
+                ) : (
+                  trainerMessages.map((msg, index) => (
+                    <div
+                      key={index}
+                      className="bg-gray-100 p-2 rounded-lg text-sm w-fit max-w-[80%]"
+                    >
+                      {msg.message}
+                    </div>
+                  ))
+                )}
               </div>
-            )}
+
+              {/* Input Section */}
+              <div className="flex gap-1 flex-shrink-0">
+                <input
+                  value={messageToTrainer}
+                  onChange={(e) => setMessageToTrainer(e.target.value)}
+                  type="text"
+                  placeholder="Type a message..."
+                  className="flex-1 border rounded-xl px-3 py-2 text-sm outline-none"
+                />
+                <button
+                  onClick={clearTrainerMessages}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm cursor-pointer"
+                >
+                  Clear
+                </button>
+                <button
+                  onClick={sendMessageToTrainer}
+                  className="bg-red-600 text-white px-4 py-2 rounded-xl text-sm cursor-pointer"
+                >
+                  Send
+                </button>
+              </div>
+            </div>
           </div>
         </section>
       </div>
