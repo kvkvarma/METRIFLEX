@@ -11,6 +11,13 @@ import ChartRadialLabel from './ChartLabel';
 import { useMemo } from 'react';
 import { Dumbbell } from 'lucide-react';
 import { set } from 'date-fns';
+// import AccordionDemo from './AccordionDemo';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 
 const TrainerDashboard = () => {
   const [clientRequests, setClientRequests] = useState([]);
@@ -21,17 +28,12 @@ const TrainerDashboard = () => {
   const [dailyMacrosData, setDailyMacrosData] = useState([]);
   const [requestsAcceptanceRatio, setRequestsAcceptanceRatio] = useState([]);
   const [goalsPopUp, setGoalsPopUp] = useState(false);
-
-  const [userPreviousGoals, setUserPreviousGoals] = useState(null);
-
   const [sendMessagePopup, setSendMessagePopup] = useState(false);
-
   const [workoutSplitPopup, setWorkoutSplitPopup] = useState(false);
   const [targetUserGoals, setTargetUserGoals] = useState({});
   const [messageToSend, setMessageToSend] = useState('');
-
   const [detailesFetched, setDetailsFetched] = useState(false);
-
+  const [clientMessages, setClientMessages] = useState([]);
   const [trainerDetails, setTrainerDetails] = useState({
     name: '',
     experience: 0,
@@ -78,6 +80,18 @@ const TrainerDashboard = () => {
           { name: 'Total Requests', count: response.data.totalReuqests },
           { name: 'Active Requests', count: response.data.totalActiveClients },
         ]);
+        const messages = await axios.get(
+          'http://localhost:8080/trainer/getclientmessages',
+          {
+            params: { trainerId: user.uid },
+          }
+        );
+        console.log('Client Messages', messages.data.clientMessages);
+        const msgs = messages.data.clientMessages;
+        const filteredMsgs = msgs.filter(
+          (item) => item.messages && item.messages.length > 0
+        );
+        setClientMessages(filteredMsgs);
       } catch (err) {
         console.log(err.message);
       }
@@ -251,6 +265,33 @@ const TrainerDashboard = () => {
       setDetailsFetched(true);
     } catch (err) {
       console.log('Error filling trainer details : ', err.message);
+    }
+  };
+  const clearMessages = async (userId) => {
+    try {
+      const res = await axios.post(
+        'http://localhost:8080/trainer/clearmessages',
+        {
+          clientId: userId,
+          trainerId: user.uid,
+        }
+      );
+      setClientMessages((prev) => prev.filter((item) => item.id !== userId));
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
+  const sendMessages = async (userId) => {
+    if (!messageToSend.trim()) return;
+    try {
+      await axios.post('http://localhost:8080/trainer/messagetoclient', {
+        userId: userId,
+        message: messageToSend,
+      });
+      setMessageToSend('');
+    } catch (err) {
+      console.log(err.message);
     }
   };
 
@@ -429,12 +470,7 @@ const TrainerDashboard = () => {
           <section className="grid grid-rows-[auto_auto_1fr] gap-4 overflow-y-auto lg:overflow-hidden">
             {/* ===== TOP ===== */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <div className="bg-white rounded-xl p-4">
-                <h2 className="font-semibold mb-2">Trainer Stats</h2>
-                <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
-                  Trainer Stats Chart
-                </div>
-              </div>
+              {/* </div> */}
 
               <div className="bg-white rounded-xl flex items-center justify-center">
                 <ChartPieSeparatorNone
@@ -739,6 +775,101 @@ const TrainerDashboard = () => {
                     </div>
                   ))
                 )}
+              </div>
+              <div className="bg-white rounded-xl p-4">
+                <h2 className="font-semibold mb-2">Trainer Stats</h2>
+                {clientMessages.length > 0 ? (
+                  <div className="h-80 rounded-lg overflow-hidden">
+                    <Accordion
+                      type="single"
+                      collapsible
+                      className="h-full overflow-y-auto p-4 space-y-3 scrollbar-hide"
+                    >
+                      {clientMessages.map((item, index) => (
+                        <AccordionItem
+                          key={index}
+                          value={`item-${index}`}
+                          className="bg-white rounded-2xl border-2 border-gray-200 shadow-sm hover:shadow-md transition-all overflow-hidden"
+                        >
+                          <AccordionTrigger className="bg-gradient-to-r from-gray-50 to-gray-100 px-5 py-3 border-b border-gray-200 hover:no-underline">
+                            <div className="flex items-center gap-3 w-full">
+                              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold shadow-md">
+                                {item.id?.toString().charAt(0) || 'C'}
+                              </div>
+
+                              <div className="text-left">
+                                <h3 className="font-bold text-gray-900 text-sm">
+                                  Client #{item.id}
+                                </h3>
+                                <p className="text-xs text-gray-500">
+                                  {item.messages.length} message(s)
+                                </p>
+                              </div>
+                            </div>
+                          </AccordionTrigger>
+
+                          <AccordionContent className="p-0">
+                            {/* Messages */}
+                            <div className="p-4 bg-gray-50 max-h-48 overflow-y-auto space-y-2 scrollbar-hide">
+                              {item.messages.map((msg, i) => (
+                                <div
+                                  key={i}
+                                  className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm"
+                                >
+                                  <p className="text-sm text-gray-700 leading-relaxed">
+                                    {msg}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Reply Section */}
+                            <div className="p-4 bg-white border-t border-gray-200">
+                              <div className="flex gap-2">
+                                <input
+                                  type="text"
+                                  value={messageToSend}
+                                  onChange={(e) =>
+                                    setMessageToSend(e.target.value)
+                                  }
+                                  placeholder="Type your reply..."
+                                  className="flex-1 px-4 py-2 rounded-lg border-2 border-gray-200 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all text-sm"
+                                />
+
+                                <button
+                                  onClick={() => clearMessages(item.id)}
+                                  className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-lg transition-all text-sm"
+                                >
+                                  Clear
+                                </button>
+
+                                <button
+                                  onClick={() => sendMessages(item.id)}
+                                  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg text-sm flex items-center gap-2"
+                                >
+                                  Send
+                                </button>
+                              </div>
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
+                  </div>
+                ) : (
+                  <div className="h-80 flex items-center justify-center text-gray-500 text-sm bg-gray-50 rounded-lg border border-gray-200">
+                    No messages from clients
+                  </div>
+                )}
+                <style jsx>{`
+                  .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
+                  }
+                  .scrollbar-hide {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                  }
+                `}</style>
               </div>
             </div>
             <h4 className="text-center font-semibold">

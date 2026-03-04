@@ -1,6 +1,6 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { Plus, Target, TrendingUp } from "lucide-react";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Plus, Target, TrendingUp } from 'lucide-react';
 
 const SmallProgressCircle = ({ percentage, achieved, total }) => {
   const RADIUS = 22;
@@ -9,10 +9,10 @@ const SmallProgressCircle = ({ percentage, achieved, total }) => {
   const dash = (percentage / 100) * CIRC;
 
   const getProgressColor = () => {
-    if (percentage >= 75) return "#10B981"; 
-    if (percentage >= 50) return "#F59E0B";
-    if (percentage >= 25) return "#3B82F6"; 
-    return "#EF4444"; 
+    if (percentage >= 75) return '#10B981';
+    if (percentage >= 50) return '#F59E0B';
+    if (percentage >= 25) return '#3B82F6';
+    return '#EF4444';
   };
 
   return (
@@ -39,8 +39,8 @@ const SmallProgressCircle = ({ percentage, achieved, total }) => {
           strokeDasharray={`${dash} ${CIRC}`}
           strokeLinecap="round"
           style={{
-            transition: "stroke-dasharray 0.8s cubic-bezier(0.4, 0, 0.2, 1)",
-            filter: "drop-shadow(0 0 2px rgba(16, 185, 129, 0.3))",
+            transition: 'stroke-dasharray 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+            filter: 'drop-shadow(0 0 2px rgba(16, 185, 129, 0.3))',
           }}
         />
       </svg>
@@ -55,14 +55,14 @@ const SmallProgressCircle = ({ percentage, achieved, total }) => {
   );
 };
 
-const TodaysPlan = ({ userGoals, todayEntry,setTodayPopup }) => {
+const TodaysPlan = ({ userGoals, todayEntry, setTodayPopup }) => {
   // const navigate = useNavigate();
 
   const goals = 4;
   let achievedGoals = 0;
-  console.log("userGoals:", userGoals);
-  console.log("todayEntry:", todayEntry);
-  
+  console.log('userGoals:', userGoals);
+  console.log('todayEntry:', todayEntry);
+
   if (todayEntry) {
     if (todayEntry.calories >= userGoals.calorieGoal) achievedGoals++;
     if (todayEntry.protein >= userGoals.proteinGoal) achievedGoals++;
@@ -74,10 +74,10 @@ const TodaysPlan = ({ userGoals, todayEntry,setTodayPopup }) => {
 
   // Get motivational message based on progress
   const getMessage = () => {
-    if (progressPercentage === 100) return "Perfect! All goals met! 🎉";
-    if (progressPercentage >= 75) return "Almost there! Keep going! 💪";
-    if (progressPercentage >= 50) return "Great progress today!";
-    if (progressPercentage >= 25) return "Good start! Stay focused!";
+    if (progressPercentage === 100) return 'Perfect! All goals met! 🎉';
+    if (progressPercentage >= 75) return 'Almost there! Keep going! 💪';
+    if (progressPercentage >= 50) return 'Great progress today!';
+    if (progressPercentage >= 25) return 'Good start! Stay focused!';
     return "Let's get started today!";
   };
 
@@ -95,12 +95,10 @@ const TodaysPlan = ({ userGoals, todayEntry,setTodayPopup }) => {
           <div className="flex items-center gap-2">
             <Target className="w-4 h-4 text-gray-600 flex-shrink-0" />
             <h3 className="text-sm font-semibold text-gray-800 truncate">
-              Today's Goals
+              Today's Stats
             </h3>
           </div>
-          <p className="text-xs text-gray-500 truncate">
-            {getMessage()}
-          </p>
+          <p className="text-xs text-gray-500 truncate">{getMessage()}</p>
         </div>
       </div>
 

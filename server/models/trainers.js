@@ -13,9 +13,15 @@ const clientsAssigned = new Schema({
   name: { type: String },
   goal: { type: String },
 });
-const messsages = new Schema({
-  message: { type: String },
+
+const clientMessageSchema = new mongoose.Schema({
+  id: String,
+  messages: {
+    type: [String],
+    default: [],
+  },
 });
+
 const trainerSchema = new Schema(
   {
     trainerId: { type: String, required: true, unique: true },
@@ -35,7 +41,7 @@ const trainerSchema = new Schema(
     trainerDetailsFilled: { type: Boolean, default: false },
     clients: { type: [clientsAssigned], default: [] },
     requests: { type: [clientRequests], default: [] },
-    clinetMessages: { type: [messsages], default: [] },
+    clientMessages: { type: [clientMessageSchema], default: [] },
   },
   { timestamps: true },
 );

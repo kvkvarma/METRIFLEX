@@ -239,4 +239,42 @@ router.get("/getTrainerDetails", async (req, res) => {
   }
 });
 
+router.get("/getclientmessages", async (req, res) => {
+  try {
+    const { trainerId } = req.query;
+    const trainer = await Trainers.findOne({ trainerId });
+    if (!trainer) {
+      return res.status(404).json({ message: "Trainer Not Found" });
+    }
+    const response = trainer.clientMessages;
+    return res.status(200).json({ clientMessages: response });
+  } catch (err) {
+    console.log(err.message);
+    return res
+      .status(500)
+      .json({ message: "Error fetching the client Messages" });
+  }
+});
+
+router.post("/clearmessages", async (req, res) => {
+  try {
+    const { clientId, trainerId } = req.body;
+    const trainer = await Trainers.findOne({ trainerId });
+    if (!trainer) {
+      return res.status(404).json({ message: "Trainer Not Found" });
+    }
+    const searchedClient = trainer.clientMessages.find(
+      (item) => item.id === clientId,
+    );
+    if (!searchedClient) {
+      return res.status(404).json({ message: "Client Messages Not Found" });
+    }
+    searchedClient.messages = [];
+    await trainer.save();
+    return res.status(200).json({ message: "Messages Cleared Successfully" });
+  } catch (err) {
+    console.log(err.message);
+  }
+});
+
 module.exports = router;

@@ -103,7 +103,11 @@ const Dashboard = () => {
     try {
       const res = axios.post(
         'http://localhost:8080/user/sendmessagetotrainer',
-        { trainerId: trainerDetails.trainerId, message: messageToTrainer }
+        {
+          trainerId: trainerDetails.trainerId,
+          message: messageToTrainer,
+          clientId: user.uid,
+        }
       );
       setMessageToTrainer('');
     } catch (err) {

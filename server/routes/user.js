@@ -53,22 +53,32 @@ router.post("/cleartrainermessages", async (req, res) => {
 });
 
 router.post("/sendmessagetotrainer", async (req, res) => {
-  const { trainerId, message } = req.body;
+  const { trainerId, message, clientId } = req.body;
+
   try {
     const trainer = await Trainers.findOne({ trainerId });
+
     if (!trainer) {
       return res.status(404).json({ message: "Trainer Not Found" });
     }
-    trainer.clinetMessages.push({
-      message,
-    });
+    const clientMessage = trainer.clientMessages.find(
+      (item) => item.id === clientId,
+    );
+    if (clientMessage) {
+      clientMessage.messages.push(message);
+    } else {
+      trainer.clientMessages.push({
+        id: clientId,
+        messages: [message],
+      });
+    }
     await trainer.save();
-    return res.status(200).json({
+    res.status(200).json({
       message: "Message Sent Successfully",
     });
   } catch (err) {
     console.log(err.message);
-    return res.status(500).json({
+    res.status(500).json({
       message: "Server Error",
     });
   }
