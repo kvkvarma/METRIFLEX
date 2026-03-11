@@ -1,71 +1,42 @@
 const express = require("express");
 const router = express.Router();
+
 const admin = require("../config/firebaseAdmin");
+
+const { sendOtp } = require("../services/authservice");
+
 const User = require("../models/users");
 const Trainer = require("../models/trainers");
 
-//User Registration
-router.post("/register", async (req, res) => {
+// ---------------- SEND OTP ----------------
+router.post("/sendOtp", async (req, res) => {
   try {
-    const decoded = await admin.auth().verifyIdToken(req.body.token);
-    if (!decoded) {
-      return res.status(401).json({ message: "Unauthorized" });
+    const { token, email, username, role } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ message: "Token missing" });
     }
+
+    const decoded = await admin.auth().verifyIdToken(token);
     const uid = decoded.uid;
-    let user = await User.findOne({ userId: uid });
-    if (!user) {
-      user = await User.create({
-        userId: uid,
-        email: req.body.email,
-        name: req.body.username || "Anonymous",
-        role: "user",
-      });
-      console.log("USER CREATED");
-    }
-    res.status(200).json({ message: "User registered successfully" });
+
+    await sendOtp(email, uid, username, role, res);
   } catch (err) {
-    console.error("FAILED:", err.message);
-    res.status(401).json({ error: err.message });
+    console.error("OTP FAILED:", err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
-//Trainer Registration
-router.post("/trainerregister", async (req, res) => {
-  try {
-    const decoded = await admin.auth().verifyIdToken(req.body.token);
-    if (!decoded) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-    const uid = decoded.uid;
-    let trainer = await Trainer.findOne({ trainerId: uid });
-    if (!trainer) {
-      trainer = await Trainer.create({
-        trainerId: uid,
-        email: req.body.email,
-        name: req.body.username || "Anonymous",
-        role: "trainer",
-        description: "",
-        experience: 0,
-        speciality: "",
-      });
-      console.log("Trainer Created");
-    }
-
-    res.status(200).json({ message: "Trainer registered successfully" });
-  } catch (err) {
-    console.error("FAILED:", err.message);
-    res.status(401).json({ error: err.message });
-  }
-});
-
+// ---------------- GOOGLE SIGNIN ----------------
 router.post("/googleSignin", async (req, res) => {
   try {
-    const decoded = await admin.auth().verifyIdToken(req.body.token);
-    if (!decoded) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
+    const { token } = req.body;
+
+    const decoded = await admin.auth().verifyIdToken(token);
     const uid = decoded.uid;
+
     let user = await User.findOne({ userId: uid });
+
     if (!user) {
       user = await User.create({
         userId: uid,
@@ -73,52 +44,56 @@ router.post("/googleSignin", async (req, res) => {
         name: decoded.name || "Anonymous",
         role: "user",
       });
-      console.log("USER CREATED VIA GOOGLE SIGNIN");
+
+      console.log("USER CREATED VIA GOOGLE");
     }
+
     res.status(200).json({ user });
   } catch (err) {
-    console.error("FAILED:", err.message);
-    res.status(401).json({ error: err.message });
+    console.error("GOOGLE SIGNIN FAILED:", err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
-//User Login
+// ---------------- USER LOGIN ----------------
 router.post("/login", async (req, res) => {
   try {
-    const decoded = await admin.auth().verifyIdToken(req.body.token);
-    if (!decoded) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
+    const { token } = req.body;
+
+    const decoded = await admin.auth().verifyIdToken(token);
     const uid = decoded.uid;
+
     const user = await User.findOne({ userId: uid });
+
     if (!user) {
-      res.status(404).json({ message: "User not found" });
-    } else {
-      res.status(200).json({ user });
+      return res.status(404).json({ message: "User not registered" });
     }
+
+    res.status(200).json({ user });
   } catch (err) {
-    console.error("FAILED:", err.message);
-    res.status(401).json({ error: err.message });
+    console.error("LOGIN FAILED:", err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
-//Trainer Login
+// ---------------- TRAINER LOGIN ----------------
 router.post("/trainerlogin", async (req, res) => {
   try {
-    const decoded = await admin.auth().verifyIdToken(req.body.token);
-    if (!decoded) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
+    const { token } = req.body;
+
+    const decoded = await admin.auth().verifyIdToken(token);
     const uid = decoded.uid;
+
     const trainer = await Trainer.findOne({ trainerId: uid });
+
     if (!trainer) {
-      res.status(404).json({ message: "Trainer not found" });
-    } else {
-      res.status(200).json({ trainer });
+      return res.status(404).json({ message: "Trainer not registered" });
     }
+
+    res.status(200).json({ trainer });
   } catch (err) {
-    console.error("FAILED:", err.message);
-    res.status(401).json({ error: err.message });
+    console.error("TRAINER LOGIN FAILED:", err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 

@@ -1,21 +1,31 @@
-import React, { useState } from "react";
-import { NavLink, Outlet } from "react-router-dom";
-import { LuLayoutDashboard } from "react-icons/lu";
-import { FaPeopleGroup } from "react-icons/fa6";
-import { MdHorizontalSplit } from "react-icons/md";
-import { GiForkKnifeSpoon } from "react-icons/gi";
-import { Dumbbell } from "lucide-react";
-import { GrLogout } from "react-icons/gr";
+import React, { useState } from 'react';
+import { NavLink, Outlet } from 'react-router-dom';
+import { LuLayoutDashboard } from 'react-icons/lu';
+import { FaPeopleGroup } from 'react-icons/fa6';
+import { MdHorizontalSplit } from 'react-icons/md';
+import { GiForkKnifeSpoon } from 'react-icons/gi';
+import { Dumbbell } from 'lucide-react';
+import { GrLogout } from 'react-icons/gr';
+import { Logout } from '@hugeicons/core-free-icons/index';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Sidebar = () => {
   const [open, setOpen] = useState(false);
-
   const navItems = [
-    { to: "/Dashboard", icon: LuLayoutDashboard, label: "Dashboard" },
-    { to: "/trainers", icon: FaPeopleGroup, label: "Trainers" },
-    { to: "/workoutsplits", icon: MdHorizontalSplit, label: "Splits" },
-    { to: "/macros", icon: GiForkKnifeSpoon, label: "Macros" },
+    { to: '/Dashboard', icon: LuLayoutDashboard, label: 'Dashboard' },
+    { to: '/trainers', icon: FaPeopleGroup, label: 'Trainers' },
+    { to: '/workoutsplits', icon: MdHorizontalSplit, label: 'Splits' },
+    { to: '/macros', icon: GiForkKnifeSpoon, label: 'Macros' },
   ];
+
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -32,7 +42,7 @@ const Sidebar = () => {
         className={`fixed lg:static z-50 top-0 left-0 h-screen w-20 bg-gradient-to-b from-gray-800 to-gray-900
             flex flex-col items-center py-6 space-y-8 shadow-2xl
             transform transition-transform duration-300 ease-in-out
-            ${open ? "translate-x-0" : "-translate-x-full"} 
+            ${open ? 'translate-x-0' : '-translate-x-full'} 
             lg:translate-x-0`}
       >
         {/* Logo */}
@@ -55,11 +65,7 @@ const Sidebar = () => {
               to={item.to}
               className={({ isActive }) =>
                 `relative flex flex-col items-center text-xs gap-1.5 px-3 py-2 rounded-xl transition-all duration-200 group
-                ${
-                  isActive
-                    ? "text-white"
-                    : "text-gray-400 hover:text-white"
-                }`
+                ${isActive ? 'text-white' : 'text-gray-400 hover:text-white'}`
               }
             >
               {({ isActive }) => (
@@ -74,14 +80,16 @@ const Sidebar = () => {
                     className={`relative p-2 rounded-lg transition-all duration-200
                     ${
                       isActive
-                        ? "bg-gray-600 shadow-lg shadow-gray-600/50"
-                        : "bg-gray-700/50 group-hover:bg-gray-700"
+                        ? 'bg-gray-600 shadow-lg shadow-gray-600/50'
+                        : 'bg-gray-700/50 group-hover:bg-gray-700'
                     }`}
                   >
                     <item.icon
                       size={22}
                       className={`transition-colors duration-200 ${
-                        isActive ? "text-white" : "text-gray-400 group-hover:text-white"
+                        isActive
+                          ? 'text-white'
+                          : 'text-gray-400 group-hover:text-white'
                       }`}
                     />
                   </div>
@@ -89,7 +97,9 @@ const Sidebar = () => {
                   {/* Label */}
                   <span
                     className={`font-medium transition-colors duration-200 ${
-                      isActive ? "text-white" : "text-gray-400 group-hover:text-white"
+                      isActive
+                        ? 'text-white'
+                        : 'text-gray-400 group-hover:text-white'
                     }`}
                   >
                     {item.label}
@@ -97,8 +107,8 @@ const Sidebar = () => {
 
                   {/* Tooltip for hover (optional) */}
                   {/* <div className="absolute left-full ml-4 px-3 py-1.5 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap shadow-xl pointer-events-none"> */}
-                    {/* {item.label} */}
-                    {/* <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-gray-800" /> */}
+                  {/* {item.label} */}
+                  {/* <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-gray-800" /> */}
                   {/* </div> */}
                 </>
               )}
@@ -110,7 +120,7 @@ const Sidebar = () => {
         <div className="mt-auto">
           <div className="w-10 h-px bg-gray-700 mb-4" />
           <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-600 transition-colors duration-200">
-            <GrLogout color="white"/>
+            <GrLogout color="white" onClick={handleLogout} />
           </div>
         </div>
       </aside>

@@ -1,22 +1,51 @@
-import React,{ useState } from 'react'
-import Dashboard from './Dashboard';
-import TrainerDashboard from './TrainerDashboard';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup} from 'firebase/auth';
+import React, { useState } from 'react';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from 'firebase/auth';
 import { auth } from '../auth/firebase';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
+const API = import.meta.env.VITE_API_URL;
+
 const Login = () => {
   const navigate = useNavigate();
-  const [mode, setMode] = useState("login");
-
   const { setUser } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
-  const [role, setRole] = useState("user");
 
+  const [mode, setMode] = useState('login');
+  const [showOtp, setShowOtp] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [token, setToken] = useState('');
+
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    username: '',
+    role: 'user',
+  });
+
+  const { email, password, username, role } = formData;
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const redirectUser = (role) => {
+    if (role === 'trainer') {
+      navigate('/TrainerDashboard');
+    } else {
+      navigate('/Dashboard');
+    }
+  };
+
+  // ---------------- REGISTER ----------------
   const handleRegister = async () => {
     try {
       const userCredential = await createUserWithEmailAndPassword(
@@ -24,86 +53,86 @@ const Login = () => {
         email,
         password
       );
-      
-      const token = await userCredential.user.getIdToken();
 
-      if(role === 'trainer'){
-        console.log("Registering as trainer");
-        const res = await axios.post('http://localhost:8080/auth/trainerregister', {
-          token,
-          email,
-          username
-        });
-        console.log(res.data);
-      }
-      else{
-        const res = await axios.post("http://localhost:8080/auth/register", {
-          token,
-          email,
-          username,
-          role
-        });
-        console.log(res.data);
-      }
-      setUser({ uid: userCredential.user.uid });
+      const idToken = await userCredential.user.getIdToken();
+      setToken(idToken);
 
-      if(role === 'trainer') {
-        navigate('/TrainerDashboard');
-      } else {
-        navigate('/Dashboard');
-      }
+      await axios.post(`${API}/sendOtp`, {
+        token: idToken,
+        email,
+        username,
+        role,
+      });
 
+      alert('OTP sent to your email');
+      setShowOtp(true);
     } catch (error) {
       console.error(error.code, error.message);
+      alert(error.message);
     }
   };
 
-  const handleLogin = async () => {
-  try {
-    const userLoggedIn = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
+  // ---------------- VERIFY OTP ----------------
+  const verifyOtp = async () => {
+    try {
+      // Here you will check OTP later in backend
+      // For now we just create the account
 
-    const token = await userLoggedIn.user.getIdToken();
+      // const endpoint = role === 'trainer' ? '/trainerregister' : '/register';
 
-    if (role === "trainer") {
-      const res = await axios.post(
-        "http://localhost:8080/auth/trainerlogin",
-        { token }
-      );
+      await axios.post(`${API}${endpoint}`, {
+        token,
+        email,
+        username,
+      });
 
-      if (res.data.trainer) {
-        // setUser({ uid: userCredential.user.uid });
-        navigate("/TrainerDashboard");
-      }
-    } else {
-      const res = await axios.post(
-        "http://localhost:8080/auth/login",
-        { token }
-      );
-
-      if (res.data.user) {
-        // setUser({uid:userLoggedIn.user.uid});
-        navigate("/Dashboard");
-      }
+      setUser({ email });
+      redirectUser(role);
+    } catch (error) {
+      console.error(error);
+      alert('OTP verification failed');
     }
-    setUser({uid:userLoggedIn.user.uid});
-  } catch (error) {
-    console.error(error.code, error.message);
-  }
-};
+  };
 
+  // ---------------- LOGIN ----------------
+  const handleLogin = async () => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
 
+      const token = await userCredential.user.getIdToken();
+
+      const endpoint = role === 'trainer' ? '/trainerlogin' : '/login';
+
+      const res = await axios.post(`${API}${endpoint}`, { token });
+
+      if (res.data.user || res.data.trainer) {
+        setUser({ uid: userCredential.user.uid });
+        redirectUser(role);
+      }
+    } catch (error) {
+      console.error(error.code, error.message);
+      alert('Invalid credentials');
+    }
+  };
+
+  // ---------------- GOOGLE LOGIN ----------------
   const googleSignin = async () => {
     try {
       const provider = new GoogleAuthProvider();
+
       const userCredential = await signInWithPopup(auth, provider);
+
       const token = await userCredential.user.getIdToken();
-      await axios.post("http://localhost:8080/auth/googleSignin", { token });
+
+      const res = await axios.post(`${API}/googleSignin`, { token });
+
       setUser({ uid: userCredential.user.uid });
-      navigate('/Dashboard');
+
+      redirectUser(res.data.role || 'user');
     } catch (error) {
       console.error(error.code, error.message);
     }
@@ -113,47 +142,45 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold text-center mb-6">
-          {mode === "login" ? "Login" : "Register"}
+          {mode === 'login' ? 'Login' : 'Register'}
         </h2>
 
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full mb-3 p-2 border rounded"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full mb-3 p-2 border rounded"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-         Login As <select
-              className="w-full mb-3 p-2 border rounded"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-            >
-              <option value="user">User</option>
-              <option value="trainer">Trainer</option>
-            </select>
-        
-        {mode === "register" && (
+        {!showOtp && (
           <>
             <input
-              type="text"
-              placeholder="Username"
+              type="email"
+              name="email"
+              placeholder="Email"
               className="w-full mb-3 p-2 border rounded"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={handleChange}
             />
 
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              className="w-full mb-3 p-2 border rounded"
+              value={password}
+              onChange={handleChange}
+            />
+
+            {mode === 'register' && (
+              <input
+                type="text"
+                name="username"
+                placeholder="Username"
+                className="w-full mb-3 p-2 border rounded"
+                value={username}
+                onChange={handleChange}
+              />
+            )}
+
             <select
+              name="role"
               className="w-full mb-3 p-2 border rounded"
               value={role}
-              onChange={(e) => setRole(e.target.value)}
+              onChange={handleChange}
             >
               <option value="user">User</option>
               <option value="trainer">Trainer</option>
@@ -161,52 +188,76 @@ const Login = () => {
           </>
         )}
 
-        {mode === "login" ? (
-          <button
-            onClick={handleLogin}
-            className="cursor-pointer w-full bg-blue-600 text-white py-2 rounded mb-3"
-          >
-            Login
-          </button>
-        ) : (
-          <button
-            onClick={handleRegister}
-            className="cursor-pointer w-full bg-green-600 text-white py-2 rounded mb-3"
-          >
-            Register
-          </button>
+        {showOtp && (
+          <>
+            <input
+              type="text"
+              placeholder="Enter OTP"
+              className="w-full mb-3 p-2 border rounded"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+            />
+
+            <button
+              onClick={verifyOtp}
+              className="w-full bg-green-600 text-white py-2 rounded"
+            >
+              Verify OTP
+            </button>
+          </>
         )}
 
-        <button
-          onClick={googleSignin}
-          className="cursor-pointer w-full border py-2 rounded mb-4 flex justify-center"
-        >
-          Continue with Google
-        </button>
-
-        <p className="text-center text-sm">
-          {mode === "login" ? (
-            <>
-              Don’t have an account?{" "}
-              <span
-                className="text-blue-600 cursor-pointer"
-                onClick={() => setMode("register")}
-              >
-                Register
-              </span>
-            </>
+        {!showOtp &&
+          (mode === 'login' ? (
+            <button
+              onClick={handleLogin}
+              className="w-full bg-blue-600 text-white py-2 rounded mb-3"
+            >
+              Login
+            </button>
           ) : (
-            <>
-              Already have an account?{" "}
-              <span
-                className="text-blue-600 cursor-pointer"
-                onClick={() => setMode("login")}
-              >
-                Login
-              </span>
-            </>
-          )}
-        </p>
+            <button
+              onClick={handleRegister}
+              className="w-full bg-green-600 text-white py-2 rounded mb-3"
+            >
+              Register
+            </button>
+          ))}
+
+        {!showOtp && (
+          <>
+            <button
+              onClick={googleSignin}
+              className="w-full border py-2 rounded mb-4 flex justify-center"
+            >
+              Continue with Google
+            </button>
+
+            <p className="text-center text-sm">
+              {mode === 'login' ? (
+                <>
+                  Don’t have an account?{' '}
+                  <span
+                    className="text-blue-600 cursor-pointer"
+                    onClick={() => setMode('register')}
+                  >
+                    Register
+                  </span>
+                </>
+              ) : (
+                <>
+                  Already have an account?{' '}
+                  <span
+                    className="text-blue-600 cursor-pointer"
+                    onClick={() => setMode('login')}
+                  >
+                    Login
+                  </span>
+                </>
+              )}
+            </p>
+          </>
+        )}
       </div>
     </div>
   );

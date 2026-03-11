@@ -32,6 +32,8 @@ const userSchema = new mongoose.Schema(
 
     email: { type: String, required: true, unique: true },
 
+    otp: { type: Number },
+
     profilePicUrl: { type: String, required: false },
 
     goal: {

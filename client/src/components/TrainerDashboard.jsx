@@ -858,7 +858,7 @@ const TrainerDashboard = () => {
                   </div>
                 ) : (
                   <div className="h-80 flex items-center justify-center text-gray-500 text-sm bg-gray-50 rounded-lg border border-gray-200">
-                    No messages from clients
+                    <h2 className="font-semibold ">No messages from clients</h2>
                   </div>
                 )}
                 <style jsx>{`

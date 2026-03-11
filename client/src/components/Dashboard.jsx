@@ -33,6 +33,7 @@ const Dashboard = () => {
     bpm: 0,
     sleep: 0,
   });
+  const API = import.meta.env.VITE_API_URL;
   const [trainerMessages, setTrainerMessages] = useState([]);
   const [messageToTrainer, setMessageToTrainer] = useState('');
   const handleChange = (e) => {
@@ -46,7 +47,7 @@ const Dashboard = () => {
   const addTodayMetrics = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8080/macros/addtodaymetrics', {
+      await axios.post(`${API}/macros/addtodaymetrics`, {
         userId: user.uid,
         ...cardioMetrics,
       });
@@ -61,34 +62,27 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         const dailyMacrosResponse = await axios.get(
-          'http://localhost:8080/macros/getDailyMacros',
+          `${API}/macros/getDailyMacros`,
           { params: { user: user.uid } }
         );
 
         const userGoalsResponse = await axios.get(
-          'http://localhost:8080/macros/getMacroGoals',
+          `${API}/macros/getMacroGoals`,
           { params: { user: user.uid } }
         );
 
-        const res = await axios.get(
-          'http://localhost:8080/trainer/getTrainers'
-        );
+        const res = await axios.get(`${API}/trainer/getTrainers`);
 
-        const userDetails = await axios.get(
-          'http://localhost:8080/user/getuserdetails',
-          {
-            params: { userId: user.uid },
-          }
-        );
+        const userDetails = await axios.get(`${API}/user/getuserdetails`, {
+          params: { userId: user.uid },
+        });
         setUserDetails(userDetails.data.userDetails);
         setTrainers(res.data.trainers);
         setDailyMacrosData(dailyMacrosResponse.data.userDailyMacrosData);
         setTargetUserGoals(userGoalsResponse.data.macroGoals.goal);
         setWorkoutSplit(userGoalsResponse.data.macroGoals.workoutSplit);
 
-        const trainersResponse = await axios.get(
-          'http://localhost:8080/trainer/getTrainers'
-        );
+        const trainersResponse = await axios.get(`${API}/trainer/getTrainers`);
         console.log('Trainers Data:', trainersResponse.data.trainers);
         setTrainers(trainersResponse.data.trainers);
       } catch (err) {
@@ -101,14 +95,11 @@ const Dashboard = () => {
 
   const sendMessageToTrainer = async () => {
     try {
-      const res = axios.post(
-        'http://localhost:8080/user/sendmessagetotrainer',
-        {
-          trainerId: trainerDetails.trainerId,
-          message: messageToTrainer,
-          clientId: user.uid,
-        }
-      );
+      const res = axios.post(`${API}/user/sendmessagetotrainer`, {
+        trainerId: trainerDetails.trainerId,
+        message: messageToTrainer,
+        clientId: user.uid,
+      });
       setMessageToTrainer('');
     } catch (err) {
       console.log(err.message);
@@ -117,10 +108,9 @@ const Dashboard = () => {
 
   const clearTrainerMessages = () => {
     try {
-      const res = axios.post(
-        'http://localhost:8080/user/cleartrainermessages',
-        { userId: user.uid }
-      );
+      const res = axios.post(`${API}/user/cleartrainermessages`, {
+        userId: user.uid,
+      });
       setTimeout(() => {
         setTrainerMessages([]);
       }, 300);
@@ -131,12 +121,9 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const getMessages = await axios.get(
-          'http://localhost:8080/user/gettrainermessages',
-          {
-            params: { userId: user.uid },
-          }
-        );
+        const getMessages = await axios.get(`${API}/user/gettrainermessages`, {
+          params: { userId: user.uid },
+        });
         setTrainerMessages(getMessages.data.trainerMessages);
         console.log('Trainer Messages: ', getMessages.data.trainerMessages);
       } catch (err) {
@@ -150,12 +137,9 @@ const Dashboard = () => {
     if (!userDetails.trainerAssigned) return;
     const fetchTrainerDetails = async () => {
       try {
-        const response = await axios.get(
-          'http://localhost:8080/trainer/getTrainerDetails',
-          {
-            params: { trainerId: userDetails.trainerAssigned },
-          }
-        );
+        const response = await axios.get(`${API}/trainer/getTrainerDetails`, {
+          params: { trainerId: userDetails.trainerAssigned },
+        });
         setTrainerDetails(response.data.trainerDetails);
       } catch (err) {
         console.error('Error fetching trainer details:', err.message);

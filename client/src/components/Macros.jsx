@@ -14,15 +14,14 @@ const Macros = () => {
   });
 
   const { user } = useAuth();
-
+  const API = import.meta.env.VITE_API_URL;
   const getMacros = async () => {
     if (!foodItem) return;
 
     try {
-      const response = await axios.get(
-        'http://localhost:8080/macros/getFoodMacros',
-        { params: { foodItem } }
-      );
+      const response = await axios.get(`${API}/macros/getFoodMacros`, {
+        params: { foodItem },
+      });
 
       const nutrients = response.data.nutrients;
 
@@ -68,7 +67,7 @@ const Macros = () => {
 
   const addMacros = async () => {
     try {
-      await axios.post('http://localhost:8080/macros/addFoodMacros', {
+      await axios.post(`${API}/macros/addFoodMacros`, {
         macros,
         userId: user.uid,
         grams,
