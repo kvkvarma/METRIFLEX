@@ -69,7 +69,7 @@ const TrainerDashboard = () => {
   // const API = 'http://localhost:8080';
   const API = import.meta.env.VITE_API_URL;
   useEffect(() => {
-    const fetchRequests = async () => {
+    async function fetchRequests() {
       if (!user?.uid) return;
       try {
         const response = await axios.get(`${API}/trainer/gettrainerrequests`, {
@@ -95,7 +95,7 @@ const TrainerDashboard = () => {
       } catch (err) {
         console.log(err.message);
       }
-    };
+    }
     fetchRequests();
   }, [user]);
 
