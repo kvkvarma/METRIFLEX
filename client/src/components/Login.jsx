@@ -10,6 +10,8 @@ import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
+// const API = 'http://localhost:8080/auth';
+
 const API = import.meta.env.VITE_API_URL;
 
 const Login = () => {
@@ -57,7 +59,7 @@ const Login = () => {
       const idToken = await userCredential.user.getIdToken();
       setToken(idToken);
 
-      await axios.post(`${API}/sendOtp`, {
+      await axios.post(`${API}/auth/sendOtp`, {
         token: idToken,
         email,
         username,
@@ -78,7 +80,7 @@ const Login = () => {
       // Here you will check OTP later in backend
       // For now we just create the account
 
-      // const endpoint = role === 'trainer' ? '/trainerregister' : '/register';
+      // const endpoint = role === 'trainer' ? '/auth/trainerregister' : '/auth/register';
 
       await axios.post(`${API}${endpoint}`, {
         token,
@@ -105,7 +107,8 @@ const Login = () => {
 
       const token = await userCredential.user.getIdToken();
 
-      const endpoint = role === 'trainer' ? '/trainerlogin' : '/login';
+      const endpoint =
+        role === 'trainer' ? '/auth/trainerlogin' : '/auth/login';
 
       const res = await axios.post(`${API}${endpoint}`, { token });
 
@@ -128,7 +131,7 @@ const Login = () => {
 
       const token = await userCredential.user.getIdToken();
 
-      const res = await axios.post(`${API}/googleSignin`, { token });
+      const res = await axios.post(`${API}/auth/googleSignin`, { token });
 
       setUser({ uid: userCredential.user.uid });
 
