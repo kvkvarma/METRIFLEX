@@ -11,14 +11,7 @@ import ChartRadialLabel from './ChartLabel';
 import { useMemo } from 'react';
 import { Dumbbell } from 'lucide-react';
 import { set } from 'date-fns';
-// import AccordionDemo from './AccordionDemo';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
-
+import LoadingAnimation from './LoadingAnimation';
 const TrainerDashboard = () => {
   const [clientRequests, setClientRequests] = useState([]);
   const [activeClients, setActiveClients] = useState([]);
@@ -34,6 +27,9 @@ const TrainerDashboard = () => {
   const [messageToSend, setMessageToSend] = useState('');
   const [detailesFetched, setDetailsFetched] = useState(false);
   const [clientMessages, setClientMessages] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+
   const [trainerDetails, setTrainerDetails] = useState({
     name: '',
     experience: 0,
@@ -64,14 +60,15 @@ const TrainerDashboard = () => {
     Saturday: '',
   });
 
+  // const API = 'http://localhost:8080';
+  const API = import.meta.env.VITE_API_URL;
   useEffect(() => {
     const fetchRequests = async () => {
       if (!user?.uid) return;
       try {
-        const response = await axios.get(
-          'http://localhost:8080/trainer/gettrainerrequests',
-          { params: { id: user.uid } }
-        );
+        const response = await axios.get(`${API}/trainer/gettrainerrequests`, {
+          params: { id: user.uid },
+        });
         setClientRequests(response.data.requests);
         setActiveClients(response.data.activeclients);
         setDetailsFetched(response.data.detailsFetched);
@@ -80,12 +77,9 @@ const TrainerDashboard = () => {
           { name: 'Total Requests', count: response.data.totalReuqests },
           { name: 'Active Requests', count: response.data.totalActiveClients },
         ]);
-        const messages = await axios.get(
-          'http://localhost:8080/trainer/getclientmessages',
-          {
-            params: { trainerId: user.uid },
-          }
-        );
+        const messages = await axios.get(`${API}/trainer/getclientmessages`, {
+          params: { trainerId: user.uid },
+        });
         console.log('Client Messages', messages.data.clientMessages);
         const msgs = messages.data.clientMessages;
         const filteredMsgs = msgs.filter(
@@ -103,17 +97,13 @@ const TrainerDashboard = () => {
     setClient(id);
     setClientName(name);
     try {
-      const res = await axios.get(
-        'http://localhost:8080/macros/getDailyMacros',
-        { params: { user: id } }
-      );
+      const res = await axios.get(`${API}/macros/getDailyMacros`, {
+        params: { user: id },
+      });
       setDailyMacrosData(res.data.userDailyMacrosData);
-      const userGoals = await axios.get(
-        'http://localhost:8080/macros/getMAcroGoals',
-        {
-          params: { user: id },
-        }
-      );
+      const userGoals = await axios.get(`${API}/macros/getMAcroGoals`, {
+        params: { user: id },
+      });
       setTargetUserGoals(userGoals.data.macroGoals.goal);
     } catch (err) {
       console.log(err.message);
@@ -168,10 +158,12 @@ const TrainerDashboard = () => {
 
   const addToClient = async (id, name, goal) => {
     try {
-      const response = await axios.post(
-        'http://localhost:8080/trainer/addclienttotrainer',
-        { trainerID: user.uid, userId: id, name, goal }
-      );
+      const response = await axios.post(`${API}/trainer/addclienttotrainer`, {
+        trainerID: user.uid,
+        userId: id,
+        name,
+        goal,
+      });
       setActiveClients((prev) => [...prev, { userId: id, name, goal }]);
       removeClientRequest(id);
       setClientRequests((prev) => prev.filter((item) => item.userId !== id));
@@ -182,10 +174,10 @@ const TrainerDashboard = () => {
 
   const removeClientRequest = async (id) => {
     try {
-      const response = await axios.post(
-        'http://localhost:8080/trainer/removeclientrequest',
-        { trainerID: user.uid, id: id }
-      );
+      const response = await axios.post(`${API}/trainer/removeclientrequest`, {
+        trainerID: user.uid,
+        id: id,
+      });
       setClientRequests((prev) => prev.filter((item) => item.userId !== id));
     } catch (err) {
       console.log(err.message);
@@ -209,10 +201,9 @@ const TrainerDashboard = () => {
     setClient(id);
     setGoalsPopUp(true);
     try {
-      const res = await axios.get(
-        'http://localhost:8080/macros/getMAcroGoals',
-        { params: { user: id } }
-      );
+      const res = await axios.get(`${API}/macros/getMAcroGoals`, {
+        params: { user: id },
+      });
       setUserPreviousGoals(res.data.macroGoals.goal);
     } catch (err) {
       console.log(err.message);
@@ -221,10 +212,10 @@ const TrainerDashboard = () => {
 
   const updateUserGoals = async () => {
     try {
-      const updatedGoals = await axios.post(
-        'http://localhost:8080/macros/updateUserGoals',
-        { userId: client, updatedGoalValues: newGoals }
-      );
+      const updatedGoals = await axios.post(`${API}/macros/updateUserGoals`, {
+        userId: client,
+        updatedGoalValues: newGoals,
+      });
     } catch (err) {
       console.log(err.message);
     }
@@ -233,10 +224,10 @@ const TrainerDashboard = () => {
 
   const sendMessageToClient = async () => {
     try {
-      const sendMessage = await axios.post(
-        'http://localhost:8080/trainer/messagetoclient',
-        { userId: client, message: messageToSend }
-      );
+      const sendMessage = await axios.post(`${API}/trainer/messagetoclient`, {
+        userId: client,
+        message: messageToSend,
+      });
       setSendMessagePopup(false);
     } catch (err) {
       console.log(err.message);
@@ -255,13 +246,10 @@ const TrainerDashboard = () => {
   const fillTrainerDetails = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        'http://localhost:8080/trainer/filltrainerdetails',
-        {
-          trainerId: user.uid,
-          ...trainerDetails,
-        }
-      );
+      const response = await axios.post(`${API}/trainer/filltrainerdetails`, {
+        trainerId: user.uid,
+        ...trainerDetails,
+      });
       setDetailsFetched(true);
     } catch (err) {
       console.log('Error filling trainer details : ', err.message);
@@ -269,13 +257,10 @@ const TrainerDashboard = () => {
   };
   const clearMessages = async (userId) => {
     try {
-      const res = await axios.post(
-        'http://localhost:8080/trainer/clearmessages',
-        {
-          clientId: userId,
-          trainerId: user.uid,
-        }
-      );
+      const res = await axios.post(`${API}/trainer/clearmessages`, {
+        clientId: userId,
+        trainerId: user.uid,
+      });
       setClientMessages((prev) => prev.filter((item) => item.id !== userId));
     } catch (err) {
       console.log(err.message);
@@ -285,7 +270,7 @@ const TrainerDashboard = () => {
   const sendMessages = async (userId) => {
     if (!messageToSend.trim()) return;
     try {
-      await axios.post('http://localhost:8080/trainer/messagetoclient', {
+      await axios.post(`${API}/trainer/messagetoclient`, {
         userId: userId,
         message: messageToSend,
       });
@@ -295,159 +280,25 @@ const TrainerDashboard = () => {
     }
   };
 
+  setTimeout(() => {
+    setLoading(false);
+  }, 1500);
+
   const saveWorkoutSplit = async () => {
     try {
-      const response = await axios.post(
-        'http://localhost:8080/trainer/updateworkoutsplit',
-        { splitGoals, userId: client }
-      );
+      const response = await axios.post(`${API}/trainer/updateworkoutsplit`, {
+        splitGoals,
+        userId: client,
+      });
       setWorkoutSplitPopup(false);
     } catch (err) {
       console.log(err.message);
     }
   };
-  if (!detailesFetched) {
-    return (
-      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-        <div className="bg-white w-[95%] max-w-lg rounded-2xl shadow-xl p-6">
-          <h2 className="text-xl font-semibold mb-5 text-center">
-            Enter Trainer Details
-          </h2>
-
-          <form className="space-y-4" onSubmit={fillTrainerDetails}>
-            {/* Name */}
-            <div>
-              <label className="block text-sm font-medium mb-1">Name</label>
-              <input
-                name="name"
-                value={trainerDetails.name}
-                onChange={updateTrainerDetails}
-                type="text"
-                required
-                className="w-full border rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            {/* Experience */}
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Experience (Years)
-              </label>
-              <input
-                name="experience"
-                value={trainerDetails.experience}
-                onChange={updateTrainerDetails}
-                type="number"
-                required
-                className="w-full border rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            {/* Status */}
-            <div>
-              <label className="block text-sm font-medium mb-1">Status</label>
-              <select
-                name="status"
-                value={trainerDetails.status}
-                onChange={updateTrainerDetails}
-                required
-                className="w-full border rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select Status</option>
-                <option value="Available">Available</option>
-                <option value="Not Available">Not Available</option>
-              </select>
-            </div>
-
-            {/* Age */}
-            <div>
-              <label className="block text-sm font-medium mb-1">Age</label>
-              <input
-                name="age"
-                value={trainerDetails.age}
-                onChange={updateTrainerDetails}
-                type="number"
-                required
-                className="w-full border rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            {/* Gender */}
-            <div>
-              <label className="block text-sm font-medium mb-1">Gender</label>
-              <select
-                name="gender"
-                value={trainerDetails.gender}
-                onChange={updateTrainerDetails}
-                required
-                className="w-full border rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-
-            {/* Proficiency */}
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Proficiency
-              </label>
-              <input
-                name="speciality"
-                value={trainerDetails.speciality}
-                onChange={updateTrainerDetails}
-                type="text"
-                required
-                placeholder="Strength Training, Yoga, Cardio..."
-                className="w-full border rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            {/* Description */}
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Description
-              </label>
-              <textarea
-                name="description"
-                value={trainerDetails.description}
-                onChange={updateTrainerDetails}
-                required
-                rows="3"
-                placeholder="Briefly describe your training style..."
-                className="w-full border rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            {/* Contact */}
-            <div>
-              <label className="block text-sm font-medium mb-1">Contact</label>
-              <input
-                name="contact"
-                value={trainerDetails.contact}
-                onChange={updateTrainerDetails}
-                type="text"
-                required
-                placeholder="Phone or Email"
-                className="w-full border rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            {/* Save Button */}
-            <button
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-medium transition"
-            >
-              Save Details
-            </button>
-          </form>
-        </div>
-      </div>
-    );
-  } else {
-    return (
+  if (detailesFetched) {
+    return loading ? (
+      <LoadingAnimation />
+    ) : (
       <div className="min-h-screen flex flex-col bg-gray-100 overflow-y-auto lg:overflow-hidden">
         {/* ================= HEADER ================= */}
         <header className="h-16 bg-white shadow-sm flex items-center px-4 shrink-0">
@@ -895,6 +746,148 @@ const TrainerDashboard = () => {
               </div>
             </div>
           </section>
+        </div>
+      </div>
+    );
+  } else {
+    return loading ? (
+      <LoadingAnimation />
+    ) : (
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="bg-white w-[95%] max-w-lg rounded-2xl shadow-xl p-6">
+          <h2 className="text-xl font-semibold mb-5 text-center">
+            Enter Trainer Details
+          </h2>
+
+          <form className="space-y-4" onSubmit={fillTrainerDetails}>
+            {/* Name */}
+            <div>
+              <label className="block text-sm font-medium mb-1">Name</label>
+              <input
+                name="name"
+                value={trainerDetails.name}
+                onChange={updateTrainerDetails}
+                type="text"
+                required
+                className="w-full border rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Experience */}
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Experience (Years)
+              </label>
+              <input
+                name="experience"
+                value={trainerDetails.experience}
+                onChange={updateTrainerDetails}
+                type="number"
+                required
+                className="w-full border rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Status */}
+            <div>
+              <label className="block text-sm font-medium mb-1">Status</label>
+              <select
+                name="status"
+                value={trainerDetails.status}
+                onChange={updateTrainerDetails}
+                required
+                className="w-full border rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select Status</option>
+                <option value="Available">Available</option>
+                <option value="Not Available">Not Available</option>
+              </select>
+            </div>
+
+            {/* Age */}
+            <div>
+              <label className="block text-sm font-medium mb-1">Age</label>
+              <input
+                name="age"
+                value={trainerDetails.age}
+                onChange={updateTrainerDetails}
+                type="number"
+                required
+                className="w-full border rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Gender */}
+            <div>
+              <label className="block text-sm font-medium mb-1">Gender</label>
+              <select
+                name="gender"
+                value={trainerDetails.gender}
+                onChange={updateTrainerDetails}
+                required
+                className="w-full border rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            {/* Proficiency */}
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Proficiency
+              </label>
+              <input
+                name="speciality"
+                value={trainerDetails.speciality}
+                onChange={updateTrainerDetails}
+                type="text"
+                required
+                placeholder="Strength Training, Yoga, Cardio..."
+                className="w-full border rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Description
+              </label>
+              <textarea
+                name="description"
+                value={trainerDetails.description}
+                onChange={updateTrainerDetails}
+                required
+                rows="3"
+                placeholder="Briefly describe your training style..."
+                className="w-full border rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Contact */}
+            <div>
+              <label className="block text-sm font-medium mb-1">Contact</label>
+              <input
+                name="contact"
+                value={trainerDetails.contact}
+                onChange={updateTrainerDetails}
+                type="text"
+                required
+                placeholder="Phone or Email"
+                className="w-full border rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Save Button */}
+            <button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-medium transition"
+            >
+              Save Details
+            </button>
+          </form>
         </div>
       </div>
     );

@@ -15,6 +15,8 @@ const Macros = () => {
 
   const { user } = useAuth();
   const API = import.meta.env.VITE_API_URL;
+  // const API = 'http://localhost:8080';
+
   const getMacros = async () => {
     if (!foodItem) return;
 
@@ -89,7 +91,7 @@ const Macros = () => {
       </button>
 
       {/* CARD */}
-      <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl p-8 transition-all duration-300">
+      <div className="max-w-lg bg-white rounded-3xl shadow-2xl p-8 transition-all duration-300">
         {/* HEADER */}
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-gray-900">Food Macros</h2>

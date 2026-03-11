@@ -9,6 +9,9 @@ const Trainers = () => {
   const [trainerID, setTrainerID] = useState('');
   const { user } = useAuth();
 
+  // const API = 'http://localhost:8080';
+  const API = import.meta.env.VITE_API_URL;
+
   const [formData, setFormData] = useState({
     name: '',
     goal: '',
@@ -20,9 +23,7 @@ const Trainers = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(
-          'http://localhost:8080/trainer/getTrainers'
-        );
+        const res = await axios.get(`${API}/trainer/getTrainers`);
         setTrainers(res.data.trainers);
       } catch (err) {
         console.error(err.message);
@@ -52,10 +53,7 @@ const Trainers = () => {
       ...formData,
     };
     try {
-      const res = await axios.post(
-        'http://localhost:8080/trainer/addrequest',
-        payLoad
-      );
+      const res = await axios.post(`${APP}/trainer/addrequest`, payLoad);
       console.log('Selected Trainer ID:', trainerID);
       setDetailsPopup(false);
       setTrainerID('');

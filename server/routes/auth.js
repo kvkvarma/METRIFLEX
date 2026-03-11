@@ -3,7 +3,7 @@ const router = express.Router();
 
 const admin = require("../config/firebaseAdmin");
 
-// const { sendOtp } = require("../services/authservice");
+const { sendOtp } = require("../services/authservice");
 
 const User = require("../models/users");
 const Trainer = require("../models/trainers");

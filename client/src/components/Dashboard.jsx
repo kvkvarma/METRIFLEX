@@ -15,6 +15,7 @@ import TodaysPlan from './TodaysPlan';
 import ChartAreaInteractive from './Chart';
 import { CalendarDemo } from './TrackingCalendar';
 import { useNavigate } from 'react-router-dom';
+import LoadingAnimation from './LoadingAnimation';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -27,12 +28,14 @@ const Dashboard = () => {
   const [todayPopUp, setTodayPopup] = useState(false);
   const [userDetails, setUserDetails] = useState({});
   const [trainerDetails, setTrainerDetails] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [cardioMetrics, setCardioMetrics] = useState({
     water: 0,
     steps: 0,
     bpm: 0,
     sleep: 0,
   });
+  // const API = 'http://localhost:8080';
   const API = import.meta.env.VITE_API_URL;
   const [trainerMessages, setTrainerMessages] = useState([]);
   const [messageToTrainer, setMessageToTrainer] = useState('');
@@ -56,7 +59,9 @@ const Dashboard = () => {
     }
     setTodayPopup(false);
   };
-
+  setTimeout(() => {
+    setLoading(false);
+  }, 1500);
   useEffect(() => {
     if (!user) return;
     const fetchData = async () => {
@@ -183,7 +188,9 @@ const Dashboard = () => {
     '2026-02-05': { calories: 2000, goal: 2000 },
   };
 
-  return (
+  return loading ? (
+    <LoadingAnimation />
+  ) : (
     <main className="h-screen overflow-hiddden p-4 lg:p-4 flex flex-col">
       <div className="max-w-[1600px] mx-auto w-full h-full flex flex-col gap-3 overflow-y-auto lg:overflow-hidden scrollbar-hide">
         {/* Header */}

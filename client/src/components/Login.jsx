@@ -9,11 +9,10 @@ import { auth } from '../auth/firebase';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import LoadingAnimation from './LoadingAnimation';
 
-// const API = 'http://localhost:8080/auth';
-
+// const API = 'http://localhost:8080';
 const API = import.meta.env.VITE_API_URL;
-
 const Login = () => {
   const navigate = useNavigate();
   const { setUser } = useAuth();
@@ -22,6 +21,7 @@ const Login = () => {
   const [showOtp, setShowOtp] = useState(false);
   const [otp, setOtp] = useState('');
   const [token, setToken] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     email: '',
@@ -43,10 +43,13 @@ const Login = () => {
     if (role === 'trainer') {
       navigate('/TrainerDashboard');
     } else {
-      navigate('/Dashboard');
+      setLoading(true);
+
+      setTimeout(() => {
+        navigate('/Dashboard');
+      }, 1500);
     }
   };
-
   // ---------------- REGISTER ----------------
   const handleRegister = async () => {
     try {
@@ -75,26 +78,24 @@ const Login = () => {
   };
 
   // ---------------- VERIFY OTP ----------------
-  const verifyOtp = async () => {
-    try {
-      // Here you will check OTP later in backend
-      // For now we just create the account
+  // const verifyOtp = async () => {
+  //   try {
+  //     const endpoint =
+  //       role === 'trainer' ? '/auth/trainerregister' : '/auth/register';
 
-      // const endpoint = role === 'trainer' ? '/auth/trainerregister' : '/auth/register';
+  //     await axios.post(`${API}${endpoint}`, {
+  //       token,
+  //       email,
+  //       username,
+  //     });
 
-      await axios.post(`${API}${endpoint}`, {
-        token,
-        email,
-        username,
-      });
-
-      setUser({ email });
-      redirectUser(role);
-    } catch (error) {
-      console.error(error);
-      alert('OTP verification failed');
-    }
-  };
+  //     setUser({ email });
+  //     redirectUser(role);
+  //   } catch (error) {
+  //     console.error(error);
+  //     alert('OTP verification failed');
+  //   }
+  // };
 
   // ---------------- LOGIN ----------------
   const handleLogin = async () => {
@@ -117,7 +118,7 @@ const Login = () => {
         redirectUser(role);
       }
     } catch (error) {
-      console.error(error.code, error.message);
+      console.error(error);
       alert('Invalid credentials');
     }
   };
@@ -140,6 +141,11 @@ const Login = () => {
       console.error(error.code, error.message);
     }
   };
+
+  // ---------------- LOADER ----------------
+  if (loading) {
+    return <LoadingAnimation />;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
