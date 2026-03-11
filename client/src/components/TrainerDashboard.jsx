@@ -12,6 +12,12 @@ import { useMemo } from 'react';
 import { Dumbbell } from 'lucide-react';
 import { set } from 'date-fns';
 import LoadingAnimation from './LoadingAnimation';
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from '@/components/ui/accordion';
 const TrainerDashboard = () => {
   const [clientRequests, setClientRequests] = useState([]);
   const [activeClients, setActiveClients] = useState([]);

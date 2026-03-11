@@ -4,10 +4,8 @@ import { IoFootsteps } from 'react-icons/io5';
 import { GiNightSleep, GiRoastChicken } from 'react-icons/gi';
 import { useOutletContext } from 'react-router-dom';
 import ProgressWithLabel from './ProgressWithLabel';
-// import Graph from './Graph';
 import CaloriesBarChart from './Graph';
 import axios from 'axios';
-// import TrackingCalendar from "./TrackingCalendar"
 import { useAuth } from '../../context/AuthContext';
 import CaloriesCard from './CaloriesCard';
 import MacrosCard from './MacroCard';
@@ -539,23 +537,23 @@ const Dashboard = () => {
               </div>
 
               {/* Input Section */}
-              <div className="flex gap-1 flex-shrink-0">
+              <div className="flex gap-1">
                 <input
                   value={messageToTrainer}
                   onChange={(e) => setMessageToTrainer(e.target.value)}
                   type="text"
                   placeholder="Type a message..."
-                  className="flex-1 border rounded-xl px-3 py-2 text-sm outline-none"
+                  className="flex-1 border rounded-xl px-2 py-2 text-sm outline-none"
                 />
                 <button
                   onClick={clearTrainerMessages}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm cursor-pointer"
+                  className="bg-blue-600 text-white px-2 py-2 rounded-xl text-sm cursor-pointer"
                 >
                   Clear
                 </button>
                 <button
                   onClick={sendMessageToTrainer}
-                  className="bg-red-600 text-white px-4 py-2 rounded-xl text-sm cursor-pointer"
+                  className="bg-red-600 text-white px-2 py-2 rounded-xl text-sm cursor-pointer"
                 >
                   Send
                 </button>

@@ -72,6 +72,12 @@ const Trainers = () => {
   if (!detailsPopup) {
     return (
       <div className="bg-gray-50 min-h-screen">
+        <button
+          onClick={(e) => navigate('/Dashboard')}
+          className="absolute cursor-pointer top-4 right-4 px-4 py-2 bg-red-900 text-white rounded-lg text-sm hover:opacity-90 z-10"
+        >
+          Exit
+        </button>
         <div className="px-6 pt-10 text-center">
           <h1 className="text-3xl font-bold text-gray-900">
             Our Professional Trainers

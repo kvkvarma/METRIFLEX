@@ -81,67 +81,67 @@ const Macros = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F6F8] relative flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[#F4F6F8] flex items-center justify-center px-2">
       {/* EXIT BUTTON */}
       <button
-        className="fixed top-4 right-4 px-4 py-2 bg-red-900 text-white rounded-lg text-sm hover:opacity-90"
+        className="fixed top-3 right-3 px-3 py-1.5 bg-red-900 text-white rounded-md text-xs hover:opacity-90"
         onClick={() => window.history.back()}
       >
         Exit
       </button>
 
       {/* CARD */}
-      <div className="max-w-lg bg-white rounded-3xl shadow-2xl p-8 transition-all duration-300">
+      <div className="max-w-lg bg-white rounded-2xl shadow-xl p-8">
         {/* HEADER */}
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Food Macros</h2>
-          <p className="text-sm text-gray-500">
-            Search food and calculate nutrition based on grams
+        <div className="mb-4">
+          <h2 className="text-xl font-bold text-gray-900">Food Macros</h2>
+          <p className="text-xs text-gray-500">
+            Search food and calculate nutrition
           </p>
         </div>
 
-        {/* SEARCH SECTION */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+        {/* SEARCH */}
+        <div className="flex flex-col sm:flex-row gap-2 mb-4">
           <input
             type="text"
-            placeholder="Search food item"
+            placeholder="Search food"
             value={foodItem}
             onChange={(e) => setFoodItem(e.target.value)}
-            className="flex-1 px-4 py-3 rounded-xl border border-gray-200
-                       focus:outline-none focus:ring-2 focus:ring-lime-400"
+            className="flex-1 px-3 py-2 rounded-lg border border-gray-200
+                     focus:outline-none focus:ring-2 focus:ring-lime-400 text-sm"
           />
 
           <input
             type="number"
             value={grams}
             onChange={(e) => setGrams(Number(e.target.value))}
-            className="w-full sm:w-28 px-4 py-3 rounded-xl border border-gray-200
-                       focus:outline-none focus:ring-2 focus:ring-lime-400"
-            placeholder="Grams"
+            className="w-full sm:w-20 px-3 py-2 rounded-lg border border-gray-200
+                     focus:outline-none focus:ring-2 focus:ring-lime-400 text-sm"
+            placeholder="g"
           />
 
           <button
             onClick={getMacros}
-            className="px-6 py-3 rounded-xl bg-lime-400 text-black font-semibold 
-                       hover:scale-105 transition"
+            className="px-4 py-2 rounded-lg bg-lime-400 text-black text-sm font-semibold 
+                     hover:scale-105 transition"
           >
             Get
           </button>
         </div>
 
-        {/* CALORIES CARD */}
+        {/* CALORIES */}
         <div
           className="bg-gradient-to-r from-red-50 to-red-100 
-                        rounded-2xl p-6 text-center mb-6 shadow-md"
+                      rounded-xl p-4 text-center mb-4 shadow"
         >
-          <p className="text-sm text-gray-600">Calories</p>
-          <p className="text-4xl font-bold text-red-500">
+          <p className="text-xs text-gray-600">Calories</p>
+          <p className="text-3xl font-bold text-red-500">
             {macros.calories} kcal
           </p>
         </div>
 
-        {/* MACROS GRID */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        {/* MACROS */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
           <MacroStat label="Protein" value={macros.protein} />
           <MacroStat label="Carbs" value={macros.carbs} />
           <MacroStat label="Fats" value={macros.fats} />
@@ -151,8 +151,8 @@ const Macros = () => {
         {/* ADD BUTTON */}
         <button
           onClick={addMacros}
-          className="w-full py-3 rounded-xl bg-black text-white font-semibold 
-                     hover:scale-105 transition"
+          className="w-full py-2.5 rounded-lg bg-black text-white text-sm font-semibold 
+                   hover:scale-105 transition"
         >
           Add to Daily Nutrition
         </button>
@@ -163,9 +163,9 @@ const Macros = () => {
 
 /* MACRO STAT CARD */
 const MacroStat = ({ label, value }) => (
-  <div className="bg-gray-50 rounded-xl p-4 text-center shadow-sm">
-    <p className="text-xs text-gray-500">{label}</p>
-    <p className="text-xl font-semibold text-gray-900">{value} g</p>
+  <div className="bg-gray-50 rounded-lg p-3 text-center shadow-sm">
+    <p className="text-[11px] text-gray-500">{label}</p>
+    <p className="text-lg font-semibold text-gray-900">{value} g</p>
   </div>
 );
 
