@@ -47,7 +47,10 @@ const Sidebar = () => {
       >
         {/* Logo */}
         <div className="relative group cursor-pointer">
-          <div className="w-12 h-12 bg-gradient-to-br from-gray-500 to-gray-700 rounded-xl flex items-center justify-center shadow-lg transform transition-transform duration-200 group-hover:scale-110 group-hover:rotate-3">
+          <div
+            onClick={() => navigate('/Dashboard')}
+            className="w-12 h-12 bg-gradient-to-br from-gray-500 to-gray-700 rounded-xl flex items-center justify-center shadow-lg transform transition-transform duration-200 group-hover:scale-110 group-hover:rotate-3"
+          >
             <Dumbbell className="w-6 h-6 text-white" strokeWidth={2.5} />
           </div>
           {/* Glow effect */}

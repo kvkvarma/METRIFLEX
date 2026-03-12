@@ -47,10 +47,12 @@ export function ChartAreaInteractive({ details }) {
 
   const filteredData = chartData.filter((item) => {
     const date = new Date(item.date);
-    const referenceDate = new Date('2024-04-30');
+    const referenceDate = new Date();
 
     let daysToSubtract = 30;
-    if (timeRange === '30d') {
+    if (timeRange === '90d') {
+      daysToSubtract = 90;
+    } else if (timeRange === '30d') {
       daysToSubtract = 30;
     } else if (timeRange === '7d') {
       daysToSubtract = 7;
@@ -107,6 +109,9 @@ export function ChartAreaInteractive({ details }) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="rounded-xl border-2 shadow-lg">
+              <SelectItem value="90d" className="rounded-lg cursor-pointer">
+                <span className="flex items-center gap-2">90 days</span>
+              </SelectItem>
               <SelectItem value="30d" className="rounded-lg cursor-pointer">
                 <span className="flex items-center gap-2">30 days</span>
               </SelectItem>
@@ -148,7 +153,7 @@ export function ChartAreaInteractive({ details }) {
         <ChartContainer config={chartConfig} className="h-full w-full">
           <AreaChart
             data={filteredData}
-            margin={{ top: 10, right: 50, left: 0, bottom: 0 }}
+            margin={{ top: 10, right: 60, left: 0, bottom: 0 }}
           >
             <defs>
               <linearGradient id="fillsteps" x1="0" y1="0" x2="0" y2="1">

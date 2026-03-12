@@ -2,16 +2,15 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { description } from './Chart';
-
+import { useNavigate } from 'react-router-dom';
 const Trainers = () => {
   const [trainers, setTrainers] = useState([]);
   const [detailsPopup, setDetailsPopup] = useState(false);
   const [trainerID, setTrainerID] = useState('');
   const { user } = useAuth();
-
-  // const API = 'http://localhost:8080';
-  const API = import.meta.env.VITE_API_URL;
-
+  const API = 'http://localhost:8080';
+  // const API = import.meta.env.VITE_API_URL;
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     goal: '',
@@ -74,7 +73,7 @@ const Trainers = () => {
       <div className="bg-gray-50 min-h-screen">
         <button
           onClick={(e) => navigate('/Dashboard')}
-          className="absolute cursor-pointer top-4 right-4 px-4 py-2 bg-red-900 text-white rounded-lg text-sm hover:opacity-90 z-10"
+          className="fixed top-3 right-3 px-3 py-1.5 bg-red-900 text-white rounded-md text-xs hover:opacity-90"
         >
           Exit
         </button>

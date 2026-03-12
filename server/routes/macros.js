@@ -156,11 +156,12 @@ router.post("/addtodaymetrics", async (req, res) => {
     await DailyMacros.findOneAndUpdate(
       { userId, date },
       {
-        $inc: {
-          sleep: sleep,
-          steps: steps,
-          water: water,
-          bpm: bpm,
+        $set: {
+          date,
+          sleep,
+          steps,
+          water,
+          bpm,
         },
       },
       { upsert: true, new: true },

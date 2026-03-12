@@ -26,17 +26,20 @@ const Dashboard = () => {
   const [todayPopUp, setTodayPopup] = useState(false);
   const [userDetails, setUserDetails] = useState({});
   const [trainerDetails, setTrainerDetails] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [cardioMetrics, setCardioMetrics] = useState({
     water: 0,
     steps: 0,
     bpm: 0,
     sleep: 0,
   });
-  // const API = 'http://localhost:8080';
-  const API = import.meta.env.VITE_API_URL;
+
+  const API = 'http://localhost:8080';
+  // const API = import.meta.env.VITE_API_URL;
+
   const [trainerMessages, setTrainerMessages] = useState([]);
   const [messageToTrainer, setMessageToTrainer] = useState('');
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCardioMetrics((prev) => ({
@@ -57,9 +60,14 @@ const Dashboard = () => {
     }
     setTodayPopup(false);
   };
-  setTimeout(() => {
-    setLoading(false);
-  }, 1500);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     if (!user) return;
     const fetchData = async () => {
@@ -98,7 +106,7 @@ const Dashboard = () => {
 
   const sendMessageToTrainer = async () => {
     try {
-      const res = axios.post(`${API}/user/sendmessagetotrainer`, {
+      const res = await axios.post(`${API}/user/sendmessagetotrainer`, {
         trainerId: trainerDetails.trainerId,
         message: messageToTrainer,
         clientId: user.uid,
@@ -109,9 +117,9 @@ const Dashboard = () => {
     }
   };
 
-  const clearTrainerMessages = () => {
+  const clearTrainerMessages = async () => {
     try {
-      const res = axios.post(`${API}/user/cleartrainermessages`, {
+      const res = await axios.post(`${API}/user/cleartrainermessages`, {
         userId: user.uid,
       });
       setTimeout(() => {
@@ -121,20 +129,23 @@ const Dashboard = () => {
       console.log('Error clearing trainer Messages', err.message);
     }
   };
+
   useEffect(() => {
+    if (!user) return;
+
     const fetchMessages = async () => {
       try {
         const getMessages = await axios.get(`${API}/user/gettrainermessages`, {
           params: { userId: user.uid },
         });
         setTrainerMessages(getMessages.data.trainerMessages);
-        console.log('Trainer Messages: ', getMessages.data.trainerMessages);
       } catch (err) {
         console.error('Error fetching messages:', err.message);
       }
     };
+
     fetchMessages();
-  }, [trainerMessages]);
+  }, [user]);
 
   useEffect(() => {
     if (!userDetails.trainerAssigned) return;
@@ -189,7 +200,7 @@ const Dashboard = () => {
   return loading ? (
     <LoadingAnimation />
   ) : (
-    <main className="h-screen overflow-hiddden p-4 lg:p-4 flex flex-col">
+    <main className="h-screen overflow-hidden p-4 lg:p-4 flex flex-col">
       <div className="max-w-[1600px] mx-auto w-full h-full flex flex-col gap-3 overflow-y-auto lg:overflow-hidden scrollbar-hide">
         {/* Header */}
         <div className="flex justify-between items-center bg-gradient-to-b from-gray-700 to-gray-900 p-4 flex-shrink-0">
@@ -332,7 +343,10 @@ const Dashboard = () => {
             <div className="flex items-center gap-2">
               <GiNightSleep size={18} color="#191970" />
               <span className="text-lg font-semibold">
-                {todayEntry?.sleep ?? 0} hr
+                {cardioMetrics.sleep == 0
+                  ? (todayEntry?.sleep ?? 0)
+                  : cardioMetrics.sleep}
+                hr
               </span>
             </div>
           </div>
@@ -342,7 +356,9 @@ const Dashboard = () => {
             <div className="flex items-center gap-2">
               <IoFootsteps size={18} color="brown" />
               <span className="text-lg font-semibold">
-                {todayEntry?.steps ?? 0}
+                {cardioMetrics.steps == 0
+                  ? (todayEntry?.steps ?? 0)
+                  : cardioMetrics.steps}
               </span>
             </div>
           </div>
@@ -362,7 +378,10 @@ const Dashboard = () => {
             <div className="flex items-center gap-2">
               <FaHeart size={16} color="red" />
               <span className="text-lg font-semibold">
-                {todayEntry?.bpm ?? 0} bpm
+                {cardioMetrics.bpm == 0
+                  ? (todayEntry?.bpm ?? 0)
+                  : cardioMetrics.bpm}
+                bpm
               </span>
             </div>
           </div>

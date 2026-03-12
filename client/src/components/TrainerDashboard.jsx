@@ -66,8 +66,8 @@ const TrainerDashboard = () => {
     Saturday: '',
   });
 
-  // const API = 'http://localhost:8080';
-  const API = import.meta.env.VITE_API_URL;
+  const API = 'http://localhost:8080';
+  // const API = import.meta.env.VITE_API_URL;
   useEffect(() => {
     async function fetchRequests() {
       if (!user?.uid) return;

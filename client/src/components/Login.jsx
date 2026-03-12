@@ -11,8 +11,8 @@ import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import LoadingAnimation from './LoadingAnimation';
 
-// const API = 'http://localhost:8080';
-const API = import.meta.env.VITE_API_URL;
+const API = 'http://localhost:8080';
+// const API = import.meta.env.VITE_API_URL;
 const Login = () => {
   const navigate = useNavigate();
   const { setUser } = useAuth();
@@ -43,11 +43,7 @@ const Login = () => {
     if (role === 'trainer') {
       navigate('/TrainerDashboard');
     } else {
-      setLoading(true);
-
-      setTimeout(() => {
-        navigate('/Dashboard');
-      }, 1500);
+      navigate('/Dashboard');
     }
   };
   // ---------------- REGISTER ----------------

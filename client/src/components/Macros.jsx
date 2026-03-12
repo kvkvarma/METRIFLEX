@@ -14,8 +14,8 @@ const Macros = () => {
   });
 
   const { user } = useAuth();
-  const API = import.meta.env.VITE_API_URL;
-  // const API = 'http://localhost:8080';
+  // const API = import.meta.env.VITE_API_URL;
+  const API = 'http://localhost:8080';
 
   const getMacros = async () => {
     if (!foodItem) return;
@@ -75,6 +75,14 @@ const Macros = () => {
         grams,
         foodItem,
       });
+      setMacros({
+        protein: 0,
+        carbs: 0,
+        fats: 0,
+        fibre: 0,
+        calories: 0,
+      });
+      setFoodItem('');
     } catch (err) {
       console.error('Error adding macros:', err.message);
     }

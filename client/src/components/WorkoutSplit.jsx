@@ -116,7 +116,7 @@ const WorkoutSplit = () => {
       {/* HEADER */}
       <button
         onClick={(e) => navigate('/Dashboard')}
-        className="absolute cursor-pointer top-4 right-4 px-4 py-2 bg-red-900 text-white rounded-lg text-sm hover:opacity-90 z-10"
+        className="fixed top-3 right-3 px-3 py-1.5 bg-red-900 text-white rounded-md text-xs hover:opacity-90"
       >
         Exit
       </button>
