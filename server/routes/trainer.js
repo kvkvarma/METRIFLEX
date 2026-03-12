@@ -18,7 +18,6 @@ router.post("/addrequest", async (req, res) => {
     const { id, user, name, goal, months, age, proficiency } = req.body;
     console.log(id, user, name, goal, months, age, proficiency);
     const trainer = await Trainers.findOne({ trainerId: id });
-
     if (!trainer) {
       return res.status(400).json({ message: "Trainer Not Found" });
     }

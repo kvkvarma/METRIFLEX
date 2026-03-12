@@ -14,8 +14,8 @@ const Macros = () => {
   });
 
   const { user } = useAuth();
-  // const API = import.meta.env.VITE_API_URL;
-  const API = 'http://localhost:8080';
+  const API = import.meta.env.VITE_API_URL;
+  // const API = 'http://localhost:8080';
 
   const getMacros = async () => {
     if (!foodItem) return;

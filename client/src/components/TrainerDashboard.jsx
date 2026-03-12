@@ -33,7 +33,6 @@ const TrainerDashboard = () => {
   const [messageToSend, setMessageToSend] = useState('');
   const [detailesFetched, setDetailsFetched] = useState(false);
   const [clientMessages, setClientMessages] = useState([]);
-
   const [loading, setLoading] = useState(true);
 
   const [trainerDetails, setTrainerDetails] = useState({
@@ -66,8 +65,8 @@ const TrainerDashboard = () => {
     Saturday: '',
   });
 
-  const API = 'http://localhost:8080';
-  // const API = import.meta.env.VITE_API_URL;
+  // const API = 'http://localhost:8080';
+  const API = import.meta.env.VITE_API_URL;
   useEffect(() => {
     async function fetchRequests() {
       if (!user?.uid) return;
@@ -301,6 +300,18 @@ const TrainerDashboard = () => {
       console.log(err.message);
     }
   };
+
+  // const getClientName = async (id) => {
+  //   try {
+  //     const response = await axios.get(`${API}/user/getclientname`, {
+  //       params: { userId: id },
+  //     });
+  //     return response.data.userName;
+  //   } catch (err) {
+  //     console.log(err.message);
+  //   }
+  // };
+
   if (detailesFetched) {
     return loading ? (
       <LoadingAnimation />
@@ -562,27 +573,49 @@ const TrainerDashboard = () => {
                       </div>
 
                       <div className="flex gap-2 items-center">
-                        <LuMessageSquareText
-                          className="cursor-pointer"
-                          size={18}
-                          onClick={() => changeMessagePopupState(item.userId)}
-                        />
+                        {/* Message Icon with Tooltip */}
+                        <div className="relative group">
+                          <LuMessageSquareText
+                            className="cursor-pointer text-gray-600"
+                            size={18}
+                            onClick={() => changeMessagePopupState(item.userId)}
+                          />
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all pointer-events-none">
+                            Message
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-gray-900"></div>
+                          </div>
+                        </div>
 
-                        <BiEdit
-                          size={18}
-                          className="cursor-pointer"
-                          onClick={() => editUserGoals(item.userId)}
-                        />
+                        {/* Edit Macros Icon with Tooltip */}
+                        <div className="relative group">
+                          <BiEdit
+                            size={18}
+                            className="cursor-pointer text-gray-600"
+                            onClick={() => editUserGoals(item.userId)}
+                          />
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all pointer-events-none">
+                            Update Macros
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-gray-900"></div>
+                          </div>
+                        </div>
 
-                        <Dumbbell
-                          size={18}
-                          className="cursor-pointer"
-                          onClick={() => editWorkoutSplit(item.userId)}
-                        />
+                        {/* Edit Split Icon with Tooltip */}
+                        <div className="relative group">
+                          <Dumbbell
+                            size={18}
+                            className="cursor-pointer text-gray-600"
+                            onClick={() => editWorkoutSplit(item.userId)}
+                          />
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all pointer-events-none">
+                            Edit Split
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-gray-900"></div>
+                          </div>
+                        </div>
 
+                        {/* View Button */}
                         <button
                           onClick={() => handleChange(item.userId, item.name)}
-                          className="text-xs bg-black text-white px-3 py-1 rounded"
+                          className="text-xs bg-black hover:bg-gray-800 text-white px-3 py-1 rounded transition-colors"
                         >
                           View
                         </button>
@@ -633,79 +666,167 @@ const TrainerDashboard = () => {
                   ))
                 )}
               </div>
-              <div className="bg-white rounded-xl p-4">
-                <h2 className="font-semibold mb-2">Trainer Stats</h2>
+              <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-200 p-5 flex flex-col h-full">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md">
+                      <span className="text-xl">💬</span>
+                    </div>
+                    <div>
+                      <h2 className="font-bold text-gray-900 text-base">
+                        Client Messages
+                      </h2>
+                      <p className="text-xs text-gray-500">
+                        {clientMessages.length} conversation(s)
+                      </p>
+                    </div>
+                  </div>
+                  {clientMessages.length > 0 && (
+                    <div className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">
+                      {clientMessages.reduce(
+                        (acc, item) => acc + item.messages.length,
+                        0
+                      )}{' '}
+                      new
+                    </div>
+                  )}
+                </div>
+
                 {clientMessages.length > 0 ? (
-                  <div className="h-80 rounded-lg overflow-hidden">
+                  <div className="flex-1 min-h-0 rounded-xl overflow-hidden bg-gray-50">
                     <Accordion
                       type="single"
                       collapsible
-                      className="h-full overflow-y-auto p-4 space-y-3 scrollbar-hide"
+                      className="h-full overflow-y-auto p-3 space-y-3 scrollbar-hide"
                     >
                       {clientMessages.map((item, index) => (
                         <AccordionItem
                           key={index}
                           value={`item-${index}`}
-                          className="bg-white rounded-2xl border-2 border-gray-200 shadow-sm hover:shadow-md transition-all overflow-hidden"
+                          className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-lg transition-all overflow-hidden group"
                         >
-                          <AccordionTrigger className="bg-gradient-to-r from-gray-50 to-gray-100 px-5 py-3 border-b border-gray-200 hover:no-underline">
+                          {/* Client Header */}
+                          <AccordionTrigger className="px-4 py-4 hover:no-underline hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all">
                             <div className="flex items-center gap-3 w-full">
-                              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold shadow-md">
-                                {item.id?.toString().charAt(0) || 'C'}
+                              <div className="relative">
+                                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg flex-shrink-0">
+                                  {item.name
+                                    ?.toString()
+                                    .charAt(0)
+                                    .toUpperCase() || 'C'}
+                                </div>
+                                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
                               </div>
 
-                              <div className="text-left">
-                                <h3 className="font-bold text-gray-900 text-sm">
-                                  Client #{item.id}
+                              <div className="text-left flex-1 min-w-0">
+                                <h3 className="font-bold text-gray-900 text-sm mb-0.5 truncate">
+                                  {item.name}
                                 </h3>
-                                <p className="text-xs text-gray-500">
-                                  {item.messages.length} message(s)
-                                </p>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-gray-500">
+                                    {item.messages.length} message
+                                    {item.messages.length !== 1 ? 's' : ''}
+                                  </span>
+                                  <span className="text-xs text-gray-300">
+                                    •
+                                  </span>
+                                  <span className="text-xs text-gray-400">
+                                    Active now
+                                  </span>
+                                </div>
+                              </div>
+
+                              <div className="flex-shrink-0">
+                                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                                  <svg
+                                    className="w-4 h-4 text-gray-600 group-hover:text-blue-600 transition-transform group-data-[state=open]:rotate-180"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M19 9l-7 7-7-7"
+                                    />
+                                  </svg>
+                                </div>
                               </div>
                             </div>
                           </AccordionTrigger>
 
                           <AccordionContent className="p-0">
-                            {/* Messages */}
-                            <div className="p-4 bg-gray-50 max-h-48 overflow-y-auto space-y-2 scrollbar-hide">
+                            {/* Messages Section */}
+                            <div className="px-4 py-3 bg-gradient-to-b from-gray-50 to-white max-h-56 overflow-y-auto space-y-3 scrollbar-hide">
                               {item.messages.map((msg, i) => (
                                 <div
                                   key={i}
-                                  className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm"
+                                  className="flex gap-3 animate-slideIn"
+                                  style={{ animationDelay: `${i * 0.05}s` }}
                                 >
-                                  <p className="text-sm text-gray-700 leading-relaxed">
-                                    {msg}
-                                  </p>
+                                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                                    {item.name
+                                      ?.toString()
+                                      .charAt(0)
+                                      .toUpperCase() || 'C'}
+                                  </div>
+                                  <div className="flex-1">
+                                    <div className="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-md border border-gray-200 hover:border-blue-200 transition-colors">
+                                      <p className="text-sm text-gray-700 leading-relaxed break-words">
+                                        {msg}
+                                      </p>
+                                    </div>
+                                    <p className="text-xs text-gray-400 mt-1 ml-2">
+                                      Just now
+                                    </p>
+                                  </div>
                                 </div>
                               ))}
                             </div>
 
                             {/* Reply Section */}
                             <div className="p-4 bg-white border-t border-gray-200">
-                              <div className="flex gap-2">
-                                <input
-                                  type="text"
-                                  value={messageToSend}
-                                  onChange={(e) =>
-                                    setMessageToSend(e.target.value)
-                                  }
-                                  placeholder="Type your reply..."
-                                  className="flex-1 px-4 py-2 rounded-lg border-2 border-gray-200 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all text-sm"
-                                />
-
-                                <button
-                                  onClick={() => clearMessages(item.id)}
-                                  className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-lg transition-all text-sm"
-                                >
-                                  Clear
-                                </button>
-
-                                <button
-                                  onClick={() => sendMessages(item.id)}
-                                  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg text-sm flex items-center gap-2"
-                                >
-                                  Send
-                                </button>
+                              <div className="flex flex-col sm:flex-row gap-2">
+                                <div className="relative flex-1">
+                                  <input
+                                    type="text"
+                                    value={messageToSend}
+                                    onChange={(e) =>
+                                      setMessageToSend(e.target.value)
+                                    }
+                                    placeholder="Type your message..."
+                                    className="w-full pl-4 pr-12 py-3 rounded-xl border-2 border-gray-200 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all text-sm bg-gray-50 hover:bg-white"
+                                  />
+                                </div>
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => clearMessages(item.id)}
+                                    className="flex-1 sm:flex-none px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-all text-sm border-2 border-transparent hover:border-gray-300"
+                                  >
+                                    🗑️ Clear
+                                  </button>
+                                  <button
+                                    onClick={() => sendMessages(item.id)}
+                                    className="flex-1 sm:flex-none px-5 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-xl text-sm flex items-center justify-center gap-2"
+                                  >
+                                    <svg
+                                      className="w-4 h-4"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                                      />
+                                    </svg>
+                                    Send
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </AccordionContent>
@@ -714,10 +835,26 @@ const TrainerDashboard = () => {
                     </Accordion>
                   </div>
                 ) : (
-                  <div className="h-80 flex items-center justify-center text-gray-500 text-sm bg-gray-50 rounded-lg border border-gray-200">
-                    <h2 className="font-semibold ">No messages from clients</h2>
+                  <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border-2 border-dashed border-gray-300">
+                    <div className="text-center p-8 sm:p-12">
+                      <div className="relative inline-block mb-4">
+                        <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center">
+                          <span className="text-4xl">💬</span>
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
+                          <span className="text-xs">💤</span>
+                        </div>
+                      </div>
+                      <h3 className="font-bold text-gray-900 mb-2 text-base">
+                        No Messages Yet
+                      </h3>
+                      <p className="text-sm text-gray-500 max-w-xs">
+                        Your client conversations will appear here. Stay tuned!
+                      </p>
+                    </div>
                   </div>
                 )}
+
                 <style jsx>{`
                   .scrollbar-hide::-webkit-scrollbar {
                     display: none;
@@ -725,6 +862,20 @@ const TrainerDashboard = () => {
                   .scrollbar-hide {
                     -ms-overflow-style: none;
                     scrollbar-width: none;
+                  }
+                  @keyframes slideIn {
+                    from {
+                      opacity: 0;
+                      transform: translateX(-10px);
+                    }
+                    to {
+                      opacity: 1;
+                      transform: translateX(0);
+                    }
+                  }
+                  .animate-slideIn {
+                    animation: slideIn 0.3s ease-out forwards;
+                    opacity: 0;
                   }
                 `}</style>
               </div>

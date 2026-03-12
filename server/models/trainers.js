@@ -16,6 +16,7 @@ const clientsAssigned = new Schema({
 
 const clientMessageSchema = new mongoose.Schema({
   id: String,
+  name: String,
   messages: {
     type: [String],
     default: [],

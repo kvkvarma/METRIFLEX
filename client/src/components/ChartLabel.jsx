@@ -43,7 +43,7 @@ export default function MacroProgressCards({ todayEntry, userGoals }) {
       label: 'Water',
       value: todayEntry.water,
       goal: userGoals.waterGoal,
-      unit: 'ml',
+      unit: 'lt',
       color: 'bg-cyan-500',
     },
     {

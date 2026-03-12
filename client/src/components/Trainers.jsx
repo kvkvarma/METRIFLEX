@@ -8,8 +8,8 @@ const Trainers = () => {
   const [detailsPopup, setDetailsPopup] = useState(false);
   const [trainerID, setTrainerID] = useState('');
   const { user } = useAuth();
-  const API = 'http://localhost:8080';
-  // const API = import.meta.env.VITE_API_URL;
+  // const API = 'http://localhost:8080';
+  const API = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
@@ -52,7 +52,7 @@ const Trainers = () => {
       ...formData,
     };
     try {
-      const res = await axios.post(`${APP}/trainer/addrequest`, payLoad);
+      const res = await axios.post(`${API}/trainer/addrequest`, payLoad);
       console.log('Selected Trainer ID:', trainerID);
       setDetailsPopup(false);
       setTrainerID('');

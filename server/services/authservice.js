@@ -1,6 +1,7 @@
 const Users = require("../models/users");
 const Trainer = require("../models/trainers");
 const nodemailer = require("nodemailer");
+const OtpSchema = require("../models/otp");
 require("dotenv").config();
 
 const transporter = nodemailer.createTransport({
@@ -26,52 +27,16 @@ const sendOtpEmail = async (email, otp) => {
   });
 };
 
-const sendOtp = async (email, uid, username, role, res) => {
+const sendOtp = async (email, res) => {
   try {
     const otp = Math.floor(100000 + Math.random() * 900000);
-
-    if (role === "user") {
-      const user = await Users.findOne({ email });
-
-      if (user) {
-        return res.status(400).json({ message: "User already exists" });
-      }
-
-      await sendOtpEmail(email, otp);
-      await Users.create({
-        userId: uid,
-        email: email,
-        name: username || "Anonymous",
-        role: "user",
-      });
-
-      console.log("USER CREATED");
-      console.log("OTP sent to USER:", email);
-    }
-
-    if (role === "trainer") {
-      const trainer = await Trainer.findOne({ email });
-
-      if (trainer) {
-        return res.status(400).json({ message: "Trainer already exists" });
-      }
-
-      await sendOtpEmail(email, otp);
-      await Trainer.create({
-        trainerId: uid,
-        email: email || decoded.email,
-        name: username || "Anonymous",
-        role: "trainer",
-        description: "",
-        experience: 0,
-        speciality: "",
-      });
-      console.log("OTP sent to TRAINER:", email);
-    }
-
+    await sendOtpEmail(email, otp);
+    await OtpSchema.create({
+      userEmail: email,
+      userOtp: otp,
+    });
     return res.status(200).json({
       message: "OTP sent successfully",
-      email,
     });
   } catch (error) {
     console.error("OTP ERROR:", error);
@@ -79,4 +44,27 @@ const sendOtp = async (email, uid, username, role, res) => {
   }
 };
 
-module.exports = { sendOtp };
+const verifyOtp = async (email, otp, res) => {
+  try {
+    const record = await OtpSchema.findOne({ userEmail: email });
+
+    if (!record) {
+      return res.status(400).json({ message: "OTP not found" });
+    }
+
+    if (record.userOtp != otp) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    await OtpSchema.deleteOne({ userEmail: email });
+
+    return res.status(200).json({
+      message: "OTP Successfully Verified",
+    });
+  } catch (err) {
+    console.error("OTP ERROR:", err.message);
+    return res.status(500).json({ message: "Verification failed" });
+  }
+};
+
+module.exports = { sendOtp, verifyOtp };
