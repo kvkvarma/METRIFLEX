@@ -52,7 +52,9 @@ router.get("/gettrainermessages", async (req, res) => {
 });
 
 router.post("/cleartrainermessages", async (req, res) => {
+  console.log("Clear Messages HIT!");
   const { userId } = req.body;
+
   try {
     const user = await User.findOne({ userId });
     if (!user) {
@@ -60,6 +62,9 @@ router.post("/cleartrainermessages", async (req, res) => {
     }
     user.trainerMessages = [];
     await user.save();
+    return res.status(200).json({
+      message: "Trainer messages cleared successfully",
+    });
   } catch (err) {
     console.log(err.message);
     return res.status(500).json({ message: "Server error" });

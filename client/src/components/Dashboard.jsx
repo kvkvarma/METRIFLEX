@@ -34,8 +34,8 @@ const Dashboard = () => {
     sleep: 0,
   });
 
-  // const API = 'http://localhost:8080';
-  const API = import.meta.env.VITE_API_URL;
+  const API = 'http://localhost:8080';
+  // const API = import.meta.env.VITE_API_URL;
 
   const [trainerMessages, setTrainerMessages] = useState([]);
   const [messageToTrainer, setMessageToTrainer] = useState('');
@@ -118,6 +118,7 @@ const Dashboard = () => {
   };
 
   const clearTrainerMessages = async () => {
+    console.log('Hitiitng Functions');
     try {
       const res = await axios.post(`${API}/user/cleartrainermessages`, {
         userId: user.uid,

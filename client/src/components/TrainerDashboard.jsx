@@ -18,6 +18,17 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from '@/components/ui/accordion';
+const renderContent = (data, component) => {
+  if (!data || (Array.isArray(data) && data.length === 0)) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-gray-400">
+        <span className="text-3xl mb-2"></span>
+        <p className="text-sm">No Active Clients to see Data</p>
+      </div>
+    );
+  }
+  return component;
+};
 const TrainerDashboard = () => {
   const [clientRequests, setClientRequests] = useState([]);
   const [activeClients, setActiveClients] = useState([]);
@@ -65,8 +76,8 @@ const TrainerDashboard = () => {
     Saturday: '',
   });
 
-  // const API = 'http://localhost:8080';
-  const API = import.meta.env.VITE_API_URL;
+  const API = 'http://localhost:8080';
+  // const API = import.meta.env.VITE_API_URL;
   useEffect(() => {
     async function fetchRequests() {
       if (!user?.uid) return;
@@ -340,10 +351,13 @@ const TrainerDashboard = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               {/* </div> */}
 
-              <div className="bg-white rounded-xl flex items-center justify-center">
-                <ChartPieSeparatorNone
-                  requestsAcceptanceRatio={requestsAcceptanceRatio}
-                />
+              <div className="bg-white rounded-xl flex items-center justify-center min-h-[250px]">
+                {renderContent(
+                  requestsAcceptanceRatio?.filter((item) => item.count > 0),
+                  <ChartPieSeparatorNone
+                    requestsAcceptanceRatio={requestsAcceptanceRatio}
+                  />
+                )}
               </div>
               {workoutSplitPopup && (
                 <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
@@ -887,19 +901,28 @@ const TrainerDashboard = () => {
             {/* ===== BOTTOM ===== */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 overflow-y-auto">
               <div className="bg-white h-80 lg:h-full rounded-xl p-4 overflow-y-auto">
-                <CaloriesBarChart dailyMacrosData={userDailyMacros} />
+                {renderContent(
+                  userDailyMacros,
+                  <CaloriesBarChart dailyMacrosData={userDailyMacros} />
+                )}
               </div>
 
               <div className="bg-white rounded-xl p-4 overflow-y-auto h-full">
-                <ChartTooltipDefault dailyMacrosData={userDailyMacros} />
+                {renderContent(
+                  userDailyMacros,
+                  <ChartTooltipDefault dailyMacrosData={userDailyMacros} />
+                )}
               </div>
 
-              <div className=" bg-white rounded-xl p-5 overflow-auto">
-                <ChartRadialLabel
-                  todayEntry={todayEntry}
-                  userGoals={userGoals}
-                  className="w-full h-full"
-                />
+              <div className="bg-white rounded-xl p-5 overflow-auto">
+                {renderContent(
+                  todayEntry,
+                  <ChartRadialLabel
+                    todayEntry={todayEntry}
+                    userGoals={userGoals}
+                    className="w-full h-full"
+                  />
+                )}
               </div>
             </div>
           </section>
