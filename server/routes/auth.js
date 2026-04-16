@@ -35,8 +35,20 @@ router.post("/register", async (req, res) => {
   try {
     const { token, email, username, role } = req.body;
 
+    if (!token || !email || !username || !role) {
+      return res.status(400).json({ message: "Missing fields" });
+    }
+
     const decoded = await admin.auth().verifyIdToken(token);
     const uid = decoded.uid;
+
+    // ✅ prevent duplicate user
+    const existingUser = await User.findOne({ userId: uid });
+    const existingTrainer = await Trainer.findOne({ trainerId: uid });
+
+    if (existingUser || existingTrainer) {
+      return res.status(400).json({ message: "User already exists" });
+    }
 
     if (role === "user") {
       await User.create({
@@ -59,10 +71,10 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    res.json({ message: "Registered successfully" });
+    res.status(200).json({ message: "Registered successfully" });
   } catch (err) {
-    console.error("REGISTER ERROR:", err.message);
-    res.status(500).json({ message: "Server error" });
+    console.error("REGISTER ERROR:", err); // ✅ IMPORTANT LOG
+    res.status(500).json({ message: err.message });
   }
 });
 

@@ -70,25 +70,34 @@ const Login = () => {
 
   const verifyOtp = async () => {
     try {
-      await axios.post(`${API}/auth/verifyOtp`, {
-        email,
-        otp,
+      const res = await axios.post(`${API}/auth/verifyOtp`, {
+        email: email.trim().toLowerCase(),
+        otp: otp.trim(),
       });
+
+      if (res.status !== 200) {
+        throw new Error('OTP failed');
+      }
+
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
+
       const token = await userCredential.user.getIdToken();
+
       await axios.post(`${API}/auth/register`, {
         token,
         email,
         username,
         role,
       });
+
       redirectUser(role);
     } catch (error) {
-      alert('OTP verification failed');
+      console.error('VERIFY ERROR:', error.response?.data || error.message);
+      alert(error.response?.data?.message || 'OTP verification failed');
     }
   };
 
