@@ -1,8 +1,19 @@
 const mongoose = require("mongoose");
 
 const otpSchema = new mongoose.Schema({
-  userEmail: { type: String, required: true },
-  userOtp: { type: Number, required: true },
+  userEmail: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  userOtp: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
-module.exports = mongoose.model("OtpSchema", otpSchema);
+module.exports = mongoose.model("Otp", otpSchema);
