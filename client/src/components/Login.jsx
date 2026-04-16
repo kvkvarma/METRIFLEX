@@ -12,8 +12,8 @@ import { useNavigate } from 'react-router-dom';
 import LoadingAnimation from './LoadingAnimation';
 import { Mail, Lock, User, Chrome, Dumbbell, ArrowRight } from 'lucide-react';
 
-const API = 'http://localhost:8080';
-// const API = import.meta.env.VITE_API_URL;
+// const API = 'http://localhost:8080';
+const API = import.meta.env.VITE_API_URL;
 
 const Login = () => {
   const navigate = useNavigate();
